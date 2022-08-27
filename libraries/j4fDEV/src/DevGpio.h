@@ -36,7 +36,7 @@ inline void DevGpio::writeGPIOB(uint8_t value)
 
 inline void DevGpio::writeIODIRA(uint8_t value)
 {
-  if (available_)
+  if (!available_)
     return;
 
   for (uint8_t pin = 0; pin < 8; pin++)
@@ -48,7 +48,7 @@ inline void DevGpio::writeIODIRA(uint8_t value)
 
 inline void DevGpio::writeIODIRB(uint8_t value)
 {
-  if (available_)
+  if (!available_)
     return;
 
   for (uint8_t pin = 0; pin < 8; pin++)
@@ -60,7 +60,7 @@ inline void DevGpio::writeIODIRB(uint8_t value)
 
 inline void DevGpio::writeGPPUA(uint8_t value)
 {
-  if (available_)
+  if (!available_)
     return;
 
   for (uint8_t pin = 0; pin < 8; pin++)
@@ -72,7 +72,7 @@ inline void DevGpio::writeGPPUA(uint8_t value)
 
 inline void DevGpio::writeGPPUB(uint8_t value)
 {
-  if (available_)
+  if (!available_)
     return;
 
   for (uint8_t pin = 0; pin < 8; pin++)
@@ -84,7 +84,7 @@ inline void DevGpio::writeGPPUB(uint8_t value)
 
 inline uint8_t DevGpio::readGPIOA(void)
 {
-  if (available_)
+  if (!available_)
     return 0x00;
 
   return mcp_.readGPIOA();
@@ -92,7 +92,7 @@ inline uint8_t DevGpio::readGPIOA(void)
 
 inline uint8_t DevGpio::readGPIOB(void)
 {
-  if (available_)
+  if (!available_)
     return 0x00;
 
   return mcp_.readGPIOB();
