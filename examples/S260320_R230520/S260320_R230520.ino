@@ -17,7 +17,7 @@ static inline void stateInitializing(void)
 {
   dev.begin();
 
-  Serial.println(F("IOS: ARCH/MCU - " Z80MBC2_ARCH));
+  Serial.println(F("IOS: ARCH/MCU - " V20MBC_ARCH));
 }
 
 static inline void stateConfiguring(void)
