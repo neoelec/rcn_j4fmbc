@@ -24,6 +24,7 @@ private:
   void __beginOnUnavailable(void);
   void __printDateTime(DateTime &date_time);
   void __printTemperature(void);
+  void __printHeadOfDateTime(void);
 
   RTC_DS3231 ds3231_;
   DateTime date_time_;

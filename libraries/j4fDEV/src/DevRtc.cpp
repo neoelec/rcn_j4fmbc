@@ -9,7 +9,7 @@ void DevRtc::begin(void)
   Serial.print(F("IOS: Compiled Date/Time - "));
   __printDateTime(compiled_date_time_);
 
-  Serial.print(F("IOS: DS3231 Date/Time   - "));
+  __printHeadOfDateTime();
   if (!ds3231_.begin())
     __beginOnUnavailable();
   else
@@ -24,7 +24,7 @@ void DevRtc::__beginOnAvailable(void)
   {
     Serial.println(F("Failure! Compiled Date/Time will be applied!"));
     adjust(compiled_date_time_);
-    Serial.print(F("IOS: DS3231 Date/Time   - "));
+    __printHeadOfDateTime();
   }
 
   refresh();
@@ -113,5 +113,11 @@ bool DevRtc::isAvailable(void)
 void DevRtc::printDateTime(void)
 {
   refresh();
+  __printHeadOfDateTime();
   __printDateTime(date_time_);
+}
+
+void DevRtc::__printHeadOfDateTime(void)
+{
+  Serial.print(F("IOS: DS3231 Date/Time   - "));
 }
