@@ -7,6 +7,7 @@ class DevGpio
 {
 public:
   void begin(void);
+  bool isAvailable(void);
   inline void writeGPIOA(uint8_t value);
   inline void writeGPIOB(uint8_t value);
   inline void writeIODIRA(uint8_t value);

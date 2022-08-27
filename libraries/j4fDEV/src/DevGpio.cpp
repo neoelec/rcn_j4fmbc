@@ -17,3 +17,8 @@ void DevGpio::begin(void)
     Serial.println(F("Found."));
   }
 }
+
+bool DevGpio::isAvailable(void)
+{
+  return available_;
+}
