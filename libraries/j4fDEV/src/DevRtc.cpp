@@ -22,8 +22,9 @@ void DevRtc::__beginOnAvailable(void)
 
   if (ds3231_.lostPower())
   {
-    Serial.println(F("Failure! Use compild!"));
+    Serial.println(F("Failure! Compiled Date/Time will be applied!"));
     adjust(compiled_date_time_);
+    Serial.print(F("IOS: DS3231 Date/Time   - "));
   }
 
   refresh();
