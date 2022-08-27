@@ -112,5 +112,6 @@ bool DevRtc::isAvailable(void)
 
 void DevRtc::printDateTime(void)
 {
+  refresh();
   __printDateTime(date_time_);
 }
