@@ -6,6 +6,7 @@
 #include "MbcDevGpio.h"
 #include "MbcDevNop.h"
 #include "MbcDevRtc.h"
+#include "MbcDevSysFlags.h"
 #include "MbcDevTty.h"
 #include "MbcDevUser.h"
 #include "MbcDisk.h"

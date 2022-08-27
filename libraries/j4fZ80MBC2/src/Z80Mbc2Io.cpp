@@ -7,10 +7,11 @@
 
 void Z80Mbc2Io::begin(Z80Mbc2Dev &dev)
 {
+  staticSysFlags_ = 0;
+  last_rx_is_empty_ = 0;
+
   __beginIoDev(dev);
   __initFromCfg(dev);
-
-  last_rx_is_empty_ = 0;
 }
 
 void Z80Mbc2Io::__beginIoDev(Z80Mbc2Dev &dev)
@@ -18,8 +19,8 @@ void Z80Mbc2Io::__beginIoDev(Z80Mbc2Dev &dev)
   auto *gpio = dev.getGpio();
   auto *user = dev.getUser();
   auto *disk = dev.getDisk();
+  auto *rtc = dev.getRtc();
 
-  rtc_ = dev.getRtc();
   pin_ = dev.getPin();
 
   wr_seldisk_.begin(disk);
@@ -39,12 +40,14 @@ void Z80Mbc2Io::__beginIoDev(Z80Mbc2Dev &dev)
   rd_gpioa_.begin(gpio);
   rd_gpiob_.begin(gpio);
 
-  rd_datetime_.begin(rtc_);
+  rd_datetime_.begin(rtc);
 
   wr_userled_.begin(user);
   rd_userkey_.begin(user);
 
   wr_setbank_.begin(pin_);
+
+  staticSysFlags_ |= rtc->isAvailable() << MbcDevRdSYSFLAGS::RTC;
 }
 
 void Z80Mbc2Io::__initFromCfg(Z80Mbc2Dev &dev)
@@ -53,7 +56,7 @@ void Z80Mbc2Io::__initFromCfg(Z80Mbc2Dev &dev)
 
   cfg.begin(dev.getSd());
 
-  autoexec_en_ = cfg.getAutoExecEn();
+  staticSysFlags_ |= cfg.getAutoExecEn() << MbcDevRdSYSFLAGS::AUTOEXEC;
   wait_count_ = 1 << cfg.getClkMode();
 }
 
@@ -68,6 +71,11 @@ void Z80Mbc2Io::run(void)
     else
       __runInterrupt();
   }
+}
+
+uint8_t Z80Mbc2Io::getSysFlag(void)
+{
+  return staticSysFlags_ | ((!!last_rx_is_empty_) << MbcDevRdSYSFLAGS::PREV_RX);
 }
 
 inline void Z80Mbc2Io::__runWrite(void)
@@ -213,7 +221,7 @@ inline void Z80Mbc2Io::__execReadCommand(void)
     break;
 
   case MbcIo::RD_SYSFLAGS:
-    __runRdSYSFLAGS();
+    rd_sysflags_.run(*this);
     break;
 
   case MbcIo::RD_DATETIME:
@@ -235,28 +243,4 @@ inline void Z80Mbc2Io::__execReadCommand(void)
   default:
     rdwr_nop_.run(*this);
   }
-}
-
-// SYSFLAGS (Various system flags for the OS):
-//                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
-//                            ---------------------------------------------------------
-//                              X  X  X  X  X  X  X  0    AUTOEXEC not enabled
-//                              X  X  X  X  X  X  X  1    AUTOEXEC enabled
-//                              X  X  X  X  X  X  0  X    DS3231 RTC not found
-//                              X  X  X  X  X  X  1  X    DS3231 RTC found
-//                              X  X  X  X  X  0  X  X    Serial RX buffer empty
-//                              X  X  X  X  X  1  X  X    Serial RX char available
-//                              X  X  X  X  0  X  X  X    Previous RX char valid
-//                              X  X  X  X  1  X  X  X    Previous RX char was a "buffer empty" flag
-//
-// NOTE: Currently only D0-D3 are used
-inline void Z80Mbc2Io::__runRdSYSFLAGS(void)
-{
-  uint8_t io_data = autoexec_en_;
-
-  io_data |= (rtc_->isAvailable()) << 1;
-  io_data |= (!!Serial.available()) << 2;
-  io_data |= (!!last_rx_is_empty_) << 3;
-  setData(io_data);
-  setCommand(MbcIo::NO_OPERATION);
 }

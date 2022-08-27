@@ -12,6 +12,7 @@ class Z80Mbc2Io : public MbcIo
 public:
   void begin(Z80Mbc2Dev &dev);
   void run(void);
+  uint8_t getSysFlag(void);
 
 private:
   void __beginIoDev(Z80Mbc2Dev &dev);
@@ -23,12 +24,10 @@ private:
   inline void __runInterrupt(void);
   inline void __execWriteCommand(void);
   inline void __execReadCommand(void);
-  inline void __runRdSYSFLAGS(void);
 
 private:
-  DevRtc *rtc_;
   Z80Mbc2Pin *pin_;
-  uint8_t autoexec_en_;
+  uint8_t staticSysFlags_;
   uint8_t wait_count_;
   uint8_t last_rx_is_empty_;
 
@@ -52,6 +51,8 @@ private:
   MbcDevRdGPIOB rd_gpiob_;
 
   MbcDevRdDATETIME rd_datetime_;
+
+  MbcDevRdSYSFLAGS rd_sysflags_;
 
   MbcDevRdSERIALRX rd_serialrx_;
   MbcDevWrSERIALTX wr_serialtx_;

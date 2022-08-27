@@ -55,6 +55,7 @@ public:
   inline void clearIrq(uint8_t number);
   inline void setIrq(uint8_t number);
   virtual void run(void) = 0;
+  virtual uint8_t getSysFlag(void) = 0;
 
 protected:
   inline void _setAddress(uint8_t address);

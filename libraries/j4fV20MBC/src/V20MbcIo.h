@@ -11,6 +11,7 @@ class V20MbcIo : public MbcIo
 public:
   void begin(V20MbcDev &dev);
   void run(void);
+  uint8_t getSysFlag(void);
 
 private:
   void __beginIoDev(V20MbcDev &dev);
@@ -21,11 +22,10 @@ private:
   inline void __runHalt(void);
   inline void __execWriteOpcode(void);
   inline void __execReadOpcode(void);
-  inline void __runRdSYSFLAGS(void);
 
 private:
-  DevRtc *rtc_;
   V20MbcPin *pin_;
+  uint8_t staticSysFlags_;
   uint8_t autoexec_en_;
   uint8_t wait_count_;
 
@@ -49,6 +49,8 @@ private:
   MbcDevRdGPIOB rd_gpiob_;
 
   MbcDevRdDATETIME rd_datetime_;
+
+  MbcDevRdSYSFLAGS rd_sysflags_;
 
   MbcDevRdSERIALRX rd_serialrx_;
   MbcDevWrSERIALTX wr_serialtx_;

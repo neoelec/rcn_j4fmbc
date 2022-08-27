@@ -7,6 +7,8 @@
 
 void V20MbcIo::begin(V20MbcDev &dev)
 {
+  staticSysFlags_ = 0;
+
   __beginIoDev(dev);
   __initFromCfg(dev);
 }
@@ -16,8 +18,8 @@ void V20MbcIo::__beginIoDev(V20MbcDev &dev)
   auto *gpio = dev.getGpio();
   auto *user = dev.getUser();
   auto *disk = dev.getDisk();
+  auto *rtc = dev.getRtc();
 
-  rtc_ = dev.getRtc();
   pin_ = dev.getPin();
 
   wr_seldisk_.begin(disk);
@@ -37,10 +39,12 @@ void V20MbcIo::__beginIoDev(V20MbcDev &dev)
   rd_gpioa_.begin(gpio);
   rd_gpiob_.begin(gpio);
 
-  rd_datetime_.begin(rtc_);
+  rd_datetime_.begin(rtc);
 
   wr_userled_.begin(user);
   rd_userkey_.begin(user);
+
+  staticSysFlags_ |= rtc->isAvailable() << MbcDevRdSYSFLAGS::RTC;
 }
 
 void V20MbcIo::__initFromCfg(V20MbcDev &dev)
@@ -49,8 +53,13 @@ void V20MbcIo::__initFromCfg(V20MbcDev &dev)
 
   cfg.begin(dev.getSd());
 
-  autoexec_en_ = cfg.getAutoExecEn();
+  staticSysFlags_ |= cfg.getAutoExecEn() << MbcDevRdSYSFLAGS::AUTOEXEC;
   wait_count_ = 1 << cfg.getClkMode();
+}
+
+uint8_t V20MbcIo::getSysFlag(void)
+{
+  return staticSysFlags_;
 }
 
 void V20MbcIo::run(void)
@@ -121,7 +130,7 @@ inline void V20MbcIo::__runRead(void)
     break;
 
   case 2: // AD1-AD0 = 2 (I/O read address = 0x02): SYSFLAGS.
-    __runRdSYSFLAGS();
+    rd_sysflags_.run(*this);
     break;
 
   case 3: // NOT USED - RESERVED
@@ -142,37 +151,6 @@ inline void V20MbcIo::__runRead(void)
   pin_->setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
   pin_->setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
   interrupts();                 // !!! End of a time critical section. Interrupt resumed
-}
-
-// .........................................................................................................
-//
-// AD1-AD0 = 2 (I/O read address = 0x02): SYSFLAGS.
-//
-// Read various system flags.
-// .........................................................................................................
-//
-//
-// SYSFLAGS (Various system flags):
-//
-//                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
-//                            ---------------------------------------------------------
-//                              X  X  X  X  X  X  X  0    AUTOEXEC not enabled
-//                              X  X  X  X  X  X  X  1    AUTOEXEC enabled
-//                              X  X  X  X  X  X  0  X    DS3231 RTC not found
-//                              X  X  X  X  X  X  1  X    DS3231 RTC found
-//                              X  X  X  X  X  0  X  X    Serial RX buffer empty
-//                              X  X  X  X  X  1  X  X    Serial RX char available
-//
-// NOTE 1: Currently only D0-D2 are used.
-// NOTE 2: This I/O do not require any previous STORE OPCODE operation.
-inline void V20MbcIo::__runRdSYSFLAGS(void)
-{
-  uint8_t io_data = autoexec_en_;
-
-  io_data |= (rtc_->isAvailable()) << 1;
-  io_data |= (!!Serial.available()) << 2;
-  setData(io_data);
-  setCommand(MbcIo::NO_OPERATION);
 }
 
 inline void V20MbcIo::__runInterrupt(void)
