@@ -4,7 +4,7 @@
 
 #include "Z80Mbc2Menu.h"
 
-#define PIN_LED_IOS 0 // PB0 pin 1    NOTE: it shares the same pin of RDYRES_
+#define PIN_LED_IOS 0 // PB0 pin 1    Led LED_IOS is ON if HIGH
 
 void Z80Mbc2Menu::begin(Z80Mbc2Dev &dev)
 {
