@@ -89,6 +89,13 @@ void Z80Mbc2Menu::doCmdToggleAutoexecEn(void)
 {
   Serial.println();
   cfg_.setAutoExecEn(!cfg_.getAutoExecEn());
+
+  Serial.print(F("IOS: CP/M Autoexec is "));
+  if (cfg_.getAutoExecEn())
+    Serial.println(F("ON"));
+  else
+    Serial.println(F("OFF"));
+
   menu_cmd_.giveCmdPrompt();
 }
 
