@@ -16,9 +16,11 @@ public:
 
 private:
   void __beginIoDev(Z80Mbc2Dev &dev);
-  void __beginIoDevWr(void);
-  void __beginIoDevRd(void);
   void __initFromCfg(Z80Mbc2Dev &dev);
+  void __initIoDevWr(void);
+  void __initIoDevRd(void);
+  void __setIoDevWr(uint8_t command, MbcDev *dev);
+  void __setIoDevRd(uint8_t command, MbcDev *dev);
   inline void __runWrite(void);
   inline void __runRead(void);
   inline void __runInterrupt(void);
@@ -30,6 +32,9 @@ private:
   uint8_t staticSysFlags_;
   uint8_t wait_count_;
   uint8_t last_rx_is_empty_;
+
+  MbcDev *io_dev_wr_[MbcIo::WR_NR_CMD];
+  MbcDev *io_dev_rd_[MbcIo::RD_NR_CMD];
 
   MbcDevRdWrNOP rdwr_nop_;
 

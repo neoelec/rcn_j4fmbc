@@ -16,6 +16,10 @@ public:
 private:
   void __beginIoDev(V20MbcDev &dev);
   void __initFromCfg(V20MbcDev &dev);
+  void __initIoDevWr(void);
+  void __initIoDevRd(void);
+  void __setIoDevWr(uint8_t command, MbcDev *dev);
+  void __setIoDevRd(uint8_t command, MbcDev *dev);
   inline void __runWrite(void);
   inline void __runRead(void);
   inline void __runInterrupt(void);
@@ -28,6 +32,9 @@ private:
   uint8_t staticSysFlags_;
   uint8_t autoexec_en_;
   uint8_t wait_count_;
+
+  MbcDev *io_dev_wr_[MbcIo::WR_NR_CMD];
+  MbcDev *io_dev_rd_[MbcIo::RD_NR_CMD];
 
   MbcDevRdWrNOP rdwr_nop_;
 

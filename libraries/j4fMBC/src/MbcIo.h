@@ -10,7 +10,8 @@ class MbcIo
 public:
   enum
   {
-    WR_USERLED = 0x0,
+    WR_BEGIN = 0x0,
+    WR_USERLED = WR_BEGIN,
     WR_SERIALTX,
     WR_RXIRQFLAG,
     WR_GPIOA,
@@ -24,7 +25,10 @@ public:
     WR_SELSECT,
     WR_WRITESECT,
     WR_SETBANK,
-    RD_USERKEY = 0x80,
+    WR_END = WR_SETBANK,
+    WR_NR_CMD = WR_END - WR_BEGIN + 1,
+    RD_BEGIN = 0x80,
+    RD_USERKEY = RD_BEGIN,
     RD_GPIOA,
     RD_GPIOB,
     RD_SYSFLAGS,
@@ -33,6 +37,8 @@ public:
     RD_READSECT,
     RD_SDMOUNT,
     RD_ATXBUFF,
+    RD_END = RD_ATXBUFF,
+    RD_NR_CMD = RD_END - RD_BEGIN + 1,
     NO_OPERATION = 0xFF,
   };
 

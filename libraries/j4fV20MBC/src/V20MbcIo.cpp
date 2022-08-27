@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#pragma GCC optimize ("O2")
+#pragma GCC optimize("O2")
 
 #include "V20MbcCfg.h"
 #include "V20MbcIo.h"
@@ -11,6 +11,8 @@ void V20MbcIo::begin(V20MbcDev &dev)
 
   __beginIoDev(dev);
   __initFromCfg(dev);
+  __initIoDevWr();
+  __initIoDevRd();
 }
 
 void V20MbcIo::__beginIoDev(V20MbcDev &dev)
@@ -57,9 +59,49 @@ void V20MbcIo::__initFromCfg(V20MbcDev &dev)
   wait_count_ = 1 << cfg.getClkMode();
 }
 
-uint8_t V20MbcIo::getSysFlag(void)
+void V20MbcIo::__initIoDevWr(void)
 {
-  return staticSysFlags_;
+  for (uint8_t command = MbcIo::WR_BEGIN; command <= MbcIo::WR_END; command++)
+    __setIoDevWr(command, &rdwr_nop_);
+
+  __setIoDevWr(MbcIo::WR_USERLED, &wr_userled_);
+  __setIoDevWr(MbcIo::WR_SERIALTX, &wr_serialtx_);
+  __setIoDevWr(MbcIo::WR_RXIRQFLAG, &wr_rxirqflag_);
+  __setIoDevWr(MbcIo::WR_GPIOA, &wr_gpioa_);
+  __setIoDevWr(MbcIo::WR_GPIOB, &wr_gpiob_);
+  __setIoDevWr(MbcIo::WR_IODIRA, &wr_iodira_);
+  __setIoDevWr(MbcIo::WR_IODIRB, &wr_iodirb_);
+  __setIoDevWr(MbcIo::WR_GPPUA, &wr_gppua_);
+  __setIoDevWr(MbcIo::WR_GPPUB, &wr_gppub_);
+  __setIoDevWr(MbcIo::WR_SELDISK, &wr_seldisk_);
+  __setIoDevWr(MbcIo::WR_SELTRACK, &wr_seltrack_);
+  __setIoDevWr(MbcIo::WR_SELSECT, &wr_selsect_);
+  __setIoDevWr(MbcIo::WR_WRITESECT, &wr_writesect_);
+}
+
+void V20MbcIo::__setIoDevWr(uint8_t command, MbcDev *dev)
+{
+  io_dev_wr_[command - MbcIo::WR_BEGIN] = dev;
+}
+
+void V20MbcIo::__initIoDevRd(void)
+{
+  for (uint8_t command = MbcIo::RD_BEGIN; command <= MbcIo::RD_END; command++)
+    __setIoDevRd(command, &rdwr_nop_);
+
+  __setIoDevRd(MbcIo::RD_USERKEY, &rd_userkey_);
+  __setIoDevRd(MbcIo::RD_GPIOA, &rd_gpioa_);
+  __setIoDevRd(MbcIo::RD_GPIOB, &rd_gpiob_);
+  __setIoDevRd(MbcIo::RD_DATETIME, &rd_datetime_);
+  __setIoDevRd(MbcIo::RD_ERRDISK, &rd_errdisk_);
+  __setIoDevRd(MbcIo::RD_READSECT, &rd_readsect_);
+  __setIoDevRd(MbcIo::RD_SDMOUNT, &rd_sdmount_);
+  __setIoDevRd(MbcIo::RD_ATXBUFF, &rd_atxbuff_);
+}
+
+void V20MbcIo::__setIoDevRd(uint8_t command, MbcDev *dev)
+{
+  io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }
 
 void V20MbcIo::run(void)
@@ -78,6 +120,11 @@ void V20MbcIo::run(void)
 
   if (Serial.available() && getIrq(MbcIo::IRQ_RX))
     pin_->setPIN_INTR_HIGH();
+}
+
+uint8_t V20MbcIo::getSysFlag(void)
+{
+  return staticSysFlags_;
 }
 
 inline void V20MbcIo::__runWrite(void)
@@ -191,102 +238,20 @@ inline void V20MbcIo::__runHalt(void)
 
 inline void V20MbcIo::__execWriteOpcode(void)
 {
-  switch (getCommand())
-  {
-  case MbcIo::WR_USERLED:
-    wr_userled_.run(*this);
-    break;
+  uint8_t command = getCommand();
 
-  case MbcIo::WR_SERIALTX:
-    wr_serialtx_.run(*this);
-    break;
-
-  case MbcIo::WR_RXIRQFLAG:
-    wr_rxirqflag_.run(*this);
-    break;
-
-  case MbcIo::WR_GPIOA:
-    wr_gpioa_.run(*this);
-    break;
-
-  case MbcIo::WR_GPIOB:
-    wr_gpiob_.run(*this);
-    break;
-
-  case MbcIo::WR_IODIRA:
-    wr_iodira_.run(*this);
-    break;
-
-  case MbcIo::WR_IODIRB:
-    wr_iodirb_.run(*this);
-    break;
-
-  case MbcIo::WR_GPPUA:
-    wr_gppua_.run(*this);
-    break;
-
-  case MbcIo::WR_GPPUB:
-    wr_gppub_.run(*this);
-    break;
-
-  case MbcIo::WR_SELDISK:
-    wr_seldisk_.run(*this);
-    break;
-
-  case MbcIo::WR_SELTRACK:
-    wr_seltrack_.run(*this);
-    break;
-
-  case MbcIo::WR_SELSECT:
-    wr_selsect_.run(*this);
-    break;
-
-  case MbcIo::WR_WRITESECT:
-    wr_writesect_.run(*this);
-    break;
-
-  default:
+  if (command >= MbcIo::WR_BEGIN && command <= MbcIo::WR_END)
+    io_dev_wr_[command - MbcIo::WR_BEGIN]->run(*this);
+  else
     rdwr_nop_.run(*this);
-  }
 }
 
 inline void V20MbcIo::__execReadOpcode(void)
 {
-  switch (getCommand())
-  {
-  case MbcIo::RD_USERKEY:
-    rd_userkey_.run(*this);
-    break;
+  uint8_t command = getCommand();
 
-  case MbcIo::RD_GPIOA:
-    rd_gpioa_.run(*this);
-    break;
-
-  case MbcIo::RD_GPIOB:
-    rd_gpiob_.run(*this);
-    break;
-
-  case MbcIo::RD_DATETIME:
-    rd_datetime_.run(*this);
-    break;
-
-  case MbcIo::RD_ERRDISK:
-    rd_errdisk_.run(*this);
-    break;
-
-  case MbcIo::RD_READSECT:
-    rd_readsect_.run(*this);
-    break;
-
-  case MbcIo::RD_SDMOUNT:
-    rd_sdmount_.run(*this);
-    break;
-
-  case MbcIo::RD_ATXBUFF:
-    rd_atxbuff_.run(*this);
-    break;
-
-  default:
+  if (command >= MbcIo::RD_BEGIN && command <= MbcIo::RD_END)
+    io_dev_rd_[command - MbcIo::RD_BEGIN]->run(*this);
+  else
     rdwr_nop_.run(*this);
-  }
 }
