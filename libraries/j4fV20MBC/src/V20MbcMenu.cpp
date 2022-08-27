@@ -42,7 +42,7 @@ void V20MbcMenu::doChangeBootMode(void)
   const uint8_t nr_boot_mode = cfg_.getNrBootMode();
 
   Serial.println();
-  Serial.printf(F("MBC: BOOT MODE [0-%d]"), nr_boot_mode - 1);
+  Serial.printf(F("IOS: BOOT MODE [0-%d]"), nr_boot_mode - 1);
   if (!menu_cmd_.getStrValue(str_bm) || !str_bm.length())
   {
     boot_mode = cfg_.getBootMode();
@@ -99,7 +99,7 @@ void V20MbcMenu::doCmdChangeClockMode(void)
   long clock_mode = cfg_.getClkMode();
 
   Serial.println();
-  Serial.printf(F("MBC: CLK MODE [0-%ld]"), clock_mode_max);
+  Serial.printf(F("IOS: CLK MODE [0-%ld]"), clock_mode_max);
   for (long i = 0; i <= clock_mode_max; i++)
   {
     Serial.println();
@@ -117,7 +117,7 @@ void V20MbcMenu::doCmdChangeClockMode(void)
 
 __exit:
   Serial.println();
-  Serial.printf(F("MBC: C> "));
+  Serial.printf(F("IOS: C> "));
   cfg_.printClk(static_cast<uint8_t>(clock_mode & 0xFF));
   Serial.println();
   cfg_.setClkMode(static_cast<uint8_t>(clock_mode & 0xFF));
@@ -132,19 +132,19 @@ void V20MbcMenu::doCmdAdjustRtc(void)
   if (!rtc_->isAvailable())
   {
     Serial.println();
-    Serial.print(F("MBC: RTC is NOT available"));
+    Serial.print(F("IOS: RTC is NOT available"));
     goto __no_change;
   }
 
   Serial.println();
-  Serial.print(F("MBC: [YYYY-MM-DDThh:mm:ss]"));
+  Serial.print(F("IOS: [YYYY-MM-DDThh:mm:ss]"));
   if (!menu_cmd_.getStrOfChar(str_dtg) || !str_dtg.length())
     goto __no_change;
 
   if (!menu_cmd_.ConvStrToDTg(str_dtg, dtg))
   {
     Serial.println();
-    Serial.print(F("MBC: Malformed input"));
+    Serial.print(F("IOS: Malformed input"));
     goto __no_change;
   }
 
