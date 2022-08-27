@@ -8,6 +8,5 @@
 #include "Z80Mbc2Loader.h"
 #include "Z80Mbc2Menu.h"
 #include "Z80Mbc2Pin.h"
-#include "j4fZ80Mbc2.h"
 
 #endif // __J4FZ80MBC2_H__
