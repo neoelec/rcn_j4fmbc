@@ -1,0 +1,46 @@
+--- a/.arduino15/packages/MightyCore/hardware/avr/2.1.3/boards.txt	2022-08-27 19:08:36.983198589 +0900
++++ b/.arduino15/packages/MightyCore/hardware/avr/2.1.3/boards.txt	2022-08-27 19:20:06.294108583 +0900
+@@ -109,15 +109,15 @@
+ 
+ # Compiler link time optimization
+ 1284.menu.LTO.Os=LTO disabled
+-1284.menu.LTO.Os.compiler.c.extra_flags=
+-1284.menu.LTO.Os.compiler.c.elf.extra_flags=
+-1284.menu.LTO.Os.compiler.cpp.extra_flags=
++1284.menu.LTO.Os.compiler.c.extra_flags=-DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
++1284.menu.LTO.Os.compiler.c.elf.extra_flags=-DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
++1284.menu.LTO.Os.compiler.cpp.extra_flags=-DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
+ 1284.menu.LTO.Os.ltoarcmd=avr-ar
+ 
+ 1284.menu.LTO.Os_flto=LTO enabled
+-1284.menu.LTO.Os_flto.compiler.c.extra_flags=-Wextra -flto -g
+-1284.menu.LTO.Os_flto.compiler.c.elf.extra_flags=-w -flto -g
+-1284.menu.LTO.Os_flto.compiler.cpp.extra_flags=-Wextra -flto -g
++1284.menu.LTO.Os_flto.compiler.c.extra_flags=-Wextra -flto -g -DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
++1284.menu.LTO.Os_flto.compiler.c.elf.extra_flags=-w -flto -g -DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
++1284.menu.LTO.Os_flto.compiler.cpp.extra_flags=-Wextra -flto -g -DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
+ 1284.menu.LTO.Os_flto.ltoarcmd=avr-gcc-ar
+ 
+ # Clock frequencies
+@@ -939,15 +939,15 @@
+ 
+ # Compiler link time optimization
+ 32.menu.LTO.Os=LTO disabled
+-32.menu.LTO.Os.compiler.c.extra_flags=
+-32.menu.LTO.Os.compiler.c.elf.extra_flags=
+-32.menu.LTO.Os.compiler.cpp.extra_flags=
++32.menu.LTO.Os.compiler.c.extra_flags=-DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
++32.menu.LTO.Os.compiler.c.elf.extra_flags=-DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
++32.menu.LTO.Os.compiler.cpp.extra_flags=-DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
+ 32.menu.LTO.Os.ltoarcmd=avr-ar
+ 
+ 32.menu.LTO.Os_flto=LTO enabled
+-32.menu.LTO.Os_flto.compiler.c.extra_flags=-Wextra -flto -g
+-32.menu.LTO.Os_flto.compiler.c.elf.extra_flags=-w -flto -g
+-32.menu.LTO.Os_flto.compiler.cpp.extra_flags=-Wextra -flto -g
++32.menu.LTO.Os_flto.compiler.c.extra_flags=-Wextra -flto -g -DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
++32.menu.LTO.Os_flto.compiler.c.elf.extra_flags=-w -flto -g -DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
++32.menu.LTO.Os_flto.compiler.cpp.extra_flags=-Wextra -flto -g -DSERIAL_RX_BUFFER_SIZE=256 -DSERIAL_TX_BUFFER_SIZE=64
+ 32.menu.LTO.Os_flto.ltoarcmd=avr-gcc-ar
+ 
+ # Clock frequencies - This is the second part of the low fuse bit concatenation
