@@ -17,8 +17,8 @@ public:
 private:
   void __beginIoDev(Z80Mbc2Dev &dev);
   void __initFromCfg(Z80Mbc2Dev &dev);
-  void __initIoDevWr(void);
-  void __initIoDevRd(void);
+  void __initIoDevWr(Z80Mbc2Dev &dev);
+  void __initIoDevRd(Z80Mbc2Dev &dev);
   void __setIoDevWr(uint8_t command, MbcDev *dev);
   void __setIoDevRd(uint8_t command, MbcDev *dev);
   inline void __runWrite(void);

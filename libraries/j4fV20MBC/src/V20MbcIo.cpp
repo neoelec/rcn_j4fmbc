@@ -11,8 +11,8 @@ void V20MbcIo::begin(V20MbcDev &dev)
 
   __beginIoDev(dev);
   __initFromCfg(dev);
-  __initIoDevWr();
-  __initIoDevRd();
+  __initIoDevWr(dev);
+  __initIoDevRd(dev);
 }
 
 void V20MbcIo::__beginIoDev(V20MbcDev &dev)
@@ -59,24 +59,30 @@ void V20MbcIo::__initFromCfg(V20MbcDev &dev)
   wait_count_ = 1 << cfg.getClkMode();
 }
 
-void V20MbcIo::__initIoDevWr(void)
+void V20MbcIo::__initIoDevWr(V20MbcDev &dev)
 {
+  auto *gpio = dev.getGpio();
+
   for (uint8_t command = MbcIo::WR_BEGIN; command <= MbcIo::WR_END; command++)
     __setIoDevWr(command, &rdwr_nop_);
 
   __setIoDevWr(MbcIo::WR_USERLED, &wr_userled_);
   __setIoDevWr(MbcIo::WR_SERIALTX, &wr_serialtx_);
   __setIoDevWr(MbcIo::WR_RXIRQFLAG, &wr_rxirqflag_);
-  __setIoDevWr(MbcIo::WR_GPIOA, &wr_gpioa_);
-  __setIoDevWr(MbcIo::WR_GPIOB, &wr_gpiob_);
-  __setIoDevWr(MbcIo::WR_IODIRA, &wr_iodira_);
-  __setIoDevWr(MbcIo::WR_IODIRB, &wr_iodirb_);
-  __setIoDevWr(MbcIo::WR_GPPUA, &wr_gppua_);
-  __setIoDevWr(MbcIo::WR_GPPUB, &wr_gppub_);
   __setIoDevWr(MbcIo::WR_SELDISK, &wr_seldisk_);
   __setIoDevWr(MbcIo::WR_SELTRACK, &wr_seltrack_);
   __setIoDevWr(MbcIo::WR_SELSECT, &wr_selsect_);
   __setIoDevWr(MbcIo::WR_WRITESECT, &wr_writesect_);
+
+  if (gpio->isAvailable())
+  {
+    __setIoDevWr(MbcIo::WR_GPIOA, &wr_gpioa_);
+    __setIoDevWr(MbcIo::WR_GPIOB, &wr_gpiob_);
+    __setIoDevWr(MbcIo::WR_IODIRA, &wr_iodira_);
+    __setIoDevWr(MbcIo::WR_IODIRB, &wr_iodirb_);
+    __setIoDevWr(MbcIo::WR_GPPUA, &wr_gppua_);
+    __setIoDevWr(MbcIo::WR_GPPUB, &wr_gppub_);
+  }
 }
 
 void V20MbcIo::__setIoDevWr(uint8_t command, MbcDev *dev)
@@ -84,19 +90,25 @@ void V20MbcIo::__setIoDevWr(uint8_t command, MbcDev *dev)
   io_dev_wr_[command - MbcIo::WR_BEGIN] = dev;
 }
 
-void V20MbcIo::__initIoDevRd(void)
+void V20MbcIo::__initIoDevRd(V20MbcDev &dev)
 {
+  auto *gpio = dev.getGpio();
+
   for (uint8_t command = MbcIo::RD_BEGIN; command <= MbcIo::RD_END; command++)
     __setIoDevRd(command, &rdwr_nop_);
 
   __setIoDevRd(MbcIo::RD_USERKEY, &rd_userkey_);
-  __setIoDevRd(MbcIo::RD_GPIOA, &rd_gpioa_);
-  __setIoDevRd(MbcIo::RD_GPIOB, &rd_gpiob_);
   __setIoDevRd(MbcIo::RD_DATETIME, &rd_datetime_);
   __setIoDevRd(MbcIo::RD_ERRDISK, &rd_errdisk_);
   __setIoDevRd(MbcIo::RD_READSECT, &rd_readsect_);
   __setIoDevRd(MbcIo::RD_SDMOUNT, &rd_sdmount_);
   __setIoDevRd(MbcIo::RD_ATXBUFF, &rd_atxbuff_);
+
+  if (gpio->isAvailable())
+  {
+    __setIoDevRd(MbcIo::RD_GPIOA, &rd_gpioa_);
+    __setIoDevRd(MbcIo::RD_GPIOB, &rd_gpiob_);
+  }
 }
 
 void V20MbcIo::__setIoDevRd(uint8_t command, MbcDev *dev)

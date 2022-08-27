@@ -12,8 +12,8 @@ void Z80Mbc2Io::begin(Z80Mbc2Dev &dev)
 
   __beginIoDev(dev);
   __initFromCfg(dev);
-  __initIoDevWr();
-  __initIoDevRd();
+  __initIoDevWr(dev);
+  __initIoDevRd(dev);
 }
 
 void Z80Mbc2Io::__beginIoDev(Z80Mbc2Dev &dev)
@@ -62,24 +62,30 @@ void Z80Mbc2Io::__initFromCfg(Z80Mbc2Dev &dev)
   wait_count_ = 1 << cfg.getClkMode();
 }
 
-void Z80Mbc2Io::__initIoDevWr(void)
+void Z80Mbc2Io::__initIoDevWr(Z80Mbc2Dev &dev)
 {
+  auto *gpio = dev.getGpio();
+
   for (uint8_t command = MbcIo::WR_BEGIN; command <= MbcIo::WR_END; command++)
     __setIoDevWr(command, &rdwr_nop_);
 
   __setIoDevWr(MbcIo::WR_USERLED, &wr_userled_);
   __setIoDevWr(MbcIo::WR_SERIALTX, &wr_serialtx_);
-  __setIoDevWr(MbcIo::WR_GPIOA, &wr_gpioa_);
-  __setIoDevWr(MbcIo::WR_GPIOB, &wr_gpiob_);
-  __setIoDevWr(MbcIo::WR_IODIRA, &wr_iodira_);
-  __setIoDevWr(MbcIo::WR_IODIRB, &wr_iodirb_);
-  __setIoDevWr(MbcIo::WR_GPPUA, &wr_gppua_);
-  __setIoDevWr(MbcIo::WR_GPPUB, &wr_gppub_);
   __setIoDevWr(MbcIo::WR_SELDISK, &wr_seldisk_);
   __setIoDevWr(MbcIo::WR_SELTRACK, &wr_seltrack_);
   __setIoDevWr(MbcIo::WR_SELSECT, &wr_selsect_);
   __setIoDevWr(MbcIo::WR_WRITESECT, &wr_writesect_);
   __setIoDevWr(MbcIo::WR_SETBANK, &wr_setbank_);
+
+  if (gpio->isAvailable())
+  {
+    __setIoDevWr(MbcIo::WR_GPIOA, &wr_gpioa_);
+    __setIoDevWr(MbcIo::WR_GPIOB, &wr_gpiob_);
+    __setIoDevWr(MbcIo::WR_IODIRA, &wr_iodira_);
+    __setIoDevWr(MbcIo::WR_IODIRB, &wr_iodirb_);
+    __setIoDevWr(MbcIo::WR_GPPUA, &wr_gppua_);
+    __setIoDevWr(MbcIo::WR_GPPUB, &wr_gppub_);
+  }
 }
 
 void Z80Mbc2Io::__setIoDevWr(uint8_t command, MbcDev *dev)
@@ -87,19 +93,25 @@ void Z80Mbc2Io::__setIoDevWr(uint8_t command, MbcDev *dev)
   io_dev_wr_[command - MbcIo::WR_BEGIN] = dev;
 }
 
-void Z80Mbc2Io::__initIoDevRd(void)
+void Z80Mbc2Io::__initIoDevRd(Z80Mbc2Dev &dev)
 {
+  auto *gpio = dev.getGpio();
+
   for (uint8_t command = MbcIo::RD_BEGIN; command <= MbcIo::RD_END; command++)
     __setIoDevRd(command, &rdwr_nop_);
 
   __setIoDevRd(MbcIo::RD_USERKEY, &rd_userkey_);
-  __setIoDevRd(MbcIo::RD_GPIOA, &rd_gpioa_);
-  __setIoDevRd(MbcIo::RD_GPIOB, &rd_gpiob_);
   __setIoDevRd(MbcIo::RD_SYSFLAGS, &rd_sysflags_);
   __setIoDevRd(MbcIo::RD_DATETIME, &rd_datetime_);
   __setIoDevRd(MbcIo::RD_ERRDISK, &rd_errdisk_);
   __setIoDevRd(MbcIo::RD_READSECT, &rd_readsect_);
   __setIoDevRd(MbcIo::RD_SDMOUNT, &rd_sdmount_);
+
+  if (gpio->isAvailable())
+  {
+    __setIoDevRd(MbcIo::RD_GPIOA, &rd_gpioa_);
+    __setIoDevRd(MbcIo::RD_GPIOB, &rd_gpiob_);
+  }
 }
 
 void Z80Mbc2Io::__setIoDevRd(uint8_t command, MbcDev *dev)

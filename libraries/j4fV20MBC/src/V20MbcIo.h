@@ -16,8 +16,8 @@ public:
 private:
   void __beginIoDev(V20MbcDev &dev);
   void __initFromCfg(V20MbcDev &dev);
-  void __initIoDevWr(void);
-  void __initIoDevRd(void);
+  void __initIoDevWr(V20MbcDev &dev);
+  void __initIoDevRd(V20MbcDev &dev);
   void __setIoDevWr(uint8_t command, MbcDev *dev);
   void __setIoDevRd(uint8_t command, MbcDev *dev);
   inline void __runWrite(void);
