@@ -5,7 +5,7 @@
 
 #include <Z80Mbc2Pin.h>
 
-class Z80Mbc2DevBank
+class Z80Mbc2DevBank : public MbcDev
 {
 public:
   void begin(Z80Mbc2Pin *pin)
