@@ -64,7 +64,7 @@ inline void MbcDisk::ioWrSELDISK(MbcIo &io)
   {
     disk_set_name_[2] = disk_set_idx_ + '0';
     disk_set_name_[4] = (disk_number / 10) + '0';
-    disk_set_name_[5] = disk_number - ((disk_number / 10) * 10) + '0';
+    disk_set_name_[5] = (disk_number % 10) + '0';
     disk_error_ = sd_->open(disk_set_name_);
   }
   else
