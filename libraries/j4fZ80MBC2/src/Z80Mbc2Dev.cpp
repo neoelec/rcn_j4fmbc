@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3_.0-or-later
 
-#include "Z80Mbc2Dev.h"
+#include "j4fZ80Mbc2.h"
 
 #define PIN_USER 13     // PD5 pin 19   Led USER and key (led USER is ON if LOW)
 #define PIN_MCU_nRTS 23 // PC7 pin 29   * RESERVED - NOT USED *

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3_.0-or-later
 
-#include "V20MbcDev.h"
+#include "j4fV20Mbc.h"
 
 #define PIN_USER 13     // PD5 pin 19   Led USER and key (led USER is ON if LOW)
 #define PIN_MCU_nRTS 11 // PD3 pin 17   * RESERVED - NOT USED *

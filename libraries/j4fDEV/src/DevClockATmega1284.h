@@ -1,7 +1,7 @@
 #ifndef __INTERNAL__DEVCLOCKATMEGA1284_H__
 #define __INTERNAL__DEVCLOCKATMEGA1284_H__
 
-#include "DevClock.h"
+#include "j4fDev.h"
 
 class DevClockATmega1284 : public DevClock{
 public:

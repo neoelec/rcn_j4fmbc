@@ -2,7 +2,7 @@
 
 #include <avr/io.h>
 
-#include "DevClockATmega32.h"
+#include "j4fDev.h"
 
 #if defined(ARDUINO_AVR_ATmega32)
 void DevClockATmega32::begin(void)

@@ -4,9 +4,7 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "V20MbcCfg.h"
-#include "V20MbcDev.h"
-#include "V20MbcPin.h"
+#include "j4fV20Mbc.h"
 
 class V20MbcLoader
 {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "DevGpio.h"
+#include "j4fDev.h"
 
 void DevGpio::begin(void)
 {

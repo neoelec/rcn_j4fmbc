@@ -1,9 +1,7 @@
 #ifndef __INTERNAL__MBCDEVDISK_H__
 #define __INTERNAL__MBCDEVDISK_H__
 
-#include "MbcDev.h"
-#include "MbcDisk.h"
-#include "MbcIo.h"
+#include "j4fMbc.h"
 
 class MbcDevDisk
 {

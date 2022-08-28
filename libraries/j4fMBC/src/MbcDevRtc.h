@@ -1,10 +1,9 @@
 #ifndef __INTERNAL__MBCDEVRTC_H__
 #define __INTERNAL__MBCDEVRTC_H__
 
-#include <DevRtc.h>
+#include <j4fDev.h>
 
-#include "MbcDev.h"
-#include "MbcIo.h"
+#include "j4fMbc.h"
 
 class MbcDevRtc
 {

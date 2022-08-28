@@ -4,8 +4,7 @@
 #include <j4fDev.h>
 #include <SerialMenuCmd.h>
 
-#include "Z80Mbc2Cfg.h"
-#include "Z80Mbc2Dev.h"
+#include "j4fZ80Mbc2.h"
 
 class Z80Mbc2Menu
 {

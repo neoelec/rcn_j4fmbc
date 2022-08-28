@@ -1,10 +1,9 @@
 #ifndef __INTERNAL__MBCDISK_H__
 #define __INTERNAL__MBCDISK_H__
 
-#include <DevSd.h>
+#include <j4fDev.h>
 
-#include "MbcDev.h"
-#include "MbcIo.h"
+#include "j4fMbc.h"
 
 #define MAX_TRACK 512
 #define MAX_SECTOR 32
@@ -60,7 +59,7 @@ inline void MbcDisk::ioWrSELDISK(MbcIo &io)
 {
   const uint8_t disk_number = io.getData();
 
-  if (disk_number <= MAX_DISK_PER_SET)
+  if (likely(disk_number <= MAX_DISK_PER_SET))
   {
     disk_set_name_[2] = disk_set_idx_ + '0';
     disk_set_name_[4] = (disk_number / 10) + '0';
@@ -76,13 +75,13 @@ inline void MbcDisk::ioWrSELTRACK(MbcIo &io)
   const uint16_t io_count = io.getCount();
   const uint8_t io_data = io.getData();
 
-  if (!io_count)
+  if (unlikely(!io_count))
     track_selected_ = io_data;
   else
   {
     track_selected_ = (static_cast<uint16_t>(io_data) << 8) | lowByte(track_selected_);
 
-    if (__isValidTrackAndSector())
+    if (likely(__isValidTrackAndSector()))
       disk_error_ = FR_OK;
     else
     {
@@ -102,7 +101,7 @@ inline void MbcDisk::ioWrSELSECT(MbcIo &io)
 {
   sector_selected_ = io.getData();
 
-  if (__isValidTrackAndSector())
+  if (likely(__isValidTrackAndSector()))
     disk_error_ = FR_OK;
   else
   {
@@ -117,9 +116,9 @@ inline void MbcDisk::ioWrWRITESECT(MbcIo &io)
 {
   const uint16_t io_count = io.getCount();
 
-  if (!io_count)
+  if (unlikely(!io_count))
   {
-    if (__isValidTrackAndSector() && (disk_error_ == FR_OK))
+    if (likely((disk_error_ == FR_OK) && __isValidTrackAndSector()))
     {
       uint32_t sector = __trackToSector(track_selected_);
       uint32_t offset = __sectorToOffset(sector + sector_selected_);
@@ -128,23 +127,23 @@ inline void MbcDisk::ioWrWRITESECT(MbcIo &io)
     }
   }
 
-  if (disk_error_ == FR_OK)
+  if (likely(disk_error_ == FR_OK))
   {
     uint16_t index = io_count % SZ_BUFFER;
 
     buffer_[index] = io.getData();
 
-    if (index == (SZ_BUFFER - 1))
+    if (unlikely(index == (SZ_BUFFER - 1)))
     {
       uint8_t sz_wrote;
 
       disk_error_ = sd_->write(buffer_, SZ_BUFFER, sz_wrote);
-      if (sz_wrote < SZ_BUFFER)
+      if (unlikely(sz_wrote < SZ_BUFFER))
         disk_error_ = UNEXPECTED_EOF;
 
-      if (io_count >= (MAX_TRACK - 1))
+      if (unlikely(io_count >= (MAX_TRACK - 1)))
       {
-        if (disk_error_ == FR_OK)
+        if (likely(disk_error_ == FR_OK))
           disk_error_ = sd_->write(NULL, 0, sz_wrote);
 
         io.setCommand(MbcIo::NO_OPERATION);
@@ -164,9 +163,9 @@ inline void MbcDisk::ioRdREADSECT(MbcIo &io)
 {
   const uint16_t io_count = io.getCount();
 
-  if (!io_count)
+  if (unlikely(!io_count))
   {
-    if (__isValidTrackAndSector() && (disk_error_ == FR_OK))
+    if (likely((disk_error_ == FR_OK) && __isValidTrackAndSector()))
     {
       uint32_t sector = __trackToSector(track_selected_);
       uint32_t offset = __sectorToOffset(sector + sector_selected_);
@@ -175,24 +174,24 @@ inline void MbcDisk::ioRdREADSECT(MbcIo &io)
     }
   }
 
-  if (disk_error_ == FR_OK)
+  if (likely(disk_error_ == FR_OK))
   {
     uint16_t index = io_count % SZ_BUFFER;
 
-    if (!index)
+    if (unlikely(!index))
     {
       uint8_t sz_read;
 
       disk_error_ = sd_->read(buffer_, SZ_BUFFER, sz_read);
-      if (sz_read < SZ_BUFFER)
+      if (unlikely(sz_read < SZ_BUFFER))
         disk_error_ = UNEXPECTED_EOF;
     }
 
-    if (disk_error_ == FR_OK)
+    if (likely(disk_error_ == FR_OK))
       io.setData(buffer_[index]);
   }
 
-  if (io_count >= (MAX_TRACK - 1))
+  if (unlikely(io_count >= (MAX_TRACK - 1)))
     io.setCommand(MbcIo::NO_OPERATION);
 
   io.setCount(io_count + 1);

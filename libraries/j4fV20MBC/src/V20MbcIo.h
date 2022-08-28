@@ -4,7 +4,7 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "V20MbcDev.h"
+#include "j4fV20Mbc.h"
 
 class V20MbcIo : public MbcIo
 {

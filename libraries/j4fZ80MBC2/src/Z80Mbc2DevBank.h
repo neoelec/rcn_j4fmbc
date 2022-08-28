@@ -3,7 +3,7 @@
 
 #include <j4fMbc.h>
 
-#include <Z80Mbc2Pin.h>
+#include "j4fZ80Mbc2.h"
 
 class Z80Mbc2DevBank : public MbcDev
 {

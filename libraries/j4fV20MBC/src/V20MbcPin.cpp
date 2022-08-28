@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "V20MbcPin.h"
+#include "j4fV20Mbc.h"
 
 void V20MbcPin::begin(void)
 {

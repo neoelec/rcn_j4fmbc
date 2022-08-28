@@ -1,10 +1,9 @@
 #ifndef __INTERNAL__MBCDEVUSER_H__
 #define __INTERNAL__MBCDEVUSER_H__
 
-#include <DevUser.h>
+#include <j4fDev.h>
 
-#include "MbcDev.h"
-#include "MbcIo.h"
+#include "j4fMbc.h"
 
 class MbcDevUser
 {

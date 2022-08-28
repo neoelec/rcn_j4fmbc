@@ -2,11 +2,7 @@
 
 #pragma GCC optimize("O2")
 
-#include "V20MbcCfg.h"
-#include "V20MbcIo.h"
-
-#define unlikely(expr) __builtin_expect(!!(expr), 0)
-#define likely(expr) __builtin_expect(!!(expr), 1)
+#include "j4fV20Mbc.h"
 
 void V20MbcIo::begin(V20MbcDev &dev)
 {

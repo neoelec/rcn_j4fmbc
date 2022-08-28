@@ -4,7 +4,7 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "Z80Mbc2Pin.h"
+#include "j4fZ80Mbc2.h"
 
 class __Z80Mbc2DevMcuVariant
 {

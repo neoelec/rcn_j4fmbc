@@ -2,7 +2,7 @@
 
 #include <EEPROM.h>
 
-#include "Z80Mbc2Cfg.h"
+#include "j4fZ80Mbc2.h"
 
 #define SZ_BUF 32
 #define SZ_CSV_BUF (SZ_BUF * 3)

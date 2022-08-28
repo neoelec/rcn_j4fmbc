@@ -4,8 +4,7 @@
 #include <j4fDev.h>
 #include <SerialMenuCmd.h>
 
-#include "V20MbcCfg.h"
-#include "V20MbcDev.h"
+#include "j4fV20Mbc.h"
 
 class V20MbcMenu
 {

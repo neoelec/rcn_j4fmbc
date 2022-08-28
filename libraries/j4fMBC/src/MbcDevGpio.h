@@ -1,10 +1,9 @@
 #ifndef __INTERNAL__MBCDEVGPIO_H__
 #define __INTERNAL__MBCDEVGPIO_H__
 
-#include <DevGpio.h>
+#include <j4fDev.h>
 
-#include "MbcDev.h"
-#include "MbcIo.h"
+#include "j4fMbc.h"
 
 class MbcDevGpio
 {

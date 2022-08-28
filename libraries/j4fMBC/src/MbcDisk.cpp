@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "MbcDisk.h"
+#include "j4fMbc.h"
 
 void MbcDisk::begin(DevSd *sd)
 {

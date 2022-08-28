@@ -2,11 +2,7 @@
 
 #pragma GCC optimize("O2")
 
-#include "Z80Mbc2Cfg.h"
-#include "Z80Mbc2Io.h"
-
-#define unlikely(expr) __builtin_expect(!!(expr), 0)
-#define likely(expr) __builtin_expect(!!(expr), 1)
+#include "j4fZ80Mbc2.h"
 
 void Z80Mbc2Io::begin(Z80Mbc2Dev &dev)
 {

@@ -4,8 +4,7 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "Z80Mbc2Dev.h"
-#include "Z80Mbc2DevBank.h"
+#include "j4fZ80Mbc2.h"
 
 class Z80Mbc2Io : public MbcIo
 {

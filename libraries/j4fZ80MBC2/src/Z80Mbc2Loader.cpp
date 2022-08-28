@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "Z80Mbc2Loader.h"
+#include "j4fZ80Mbc2.h"
 
 void Z80Mbc2Loader::begin(Z80Mbc2Dev &dev)
 {

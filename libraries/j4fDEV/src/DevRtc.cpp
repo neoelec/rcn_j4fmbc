@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "DevRtc.h"
+#include "j4fDev.h"
 
 void DevRtc::begin(void)
 {
@@ -60,13 +60,13 @@ void DevRtc::__printTemperature(void)
 
 void DevRtc::adjust(DateTime &date_time)
 {
-  if (available_)
+  if (likely(available_))
     ds3231_.adjust(date_time);
 }
 
 void DevRtc::refresh(void)
 {
-  if (available_)
+  if (likely(available_))
     date_time_ = ds3231_.now();
 }
 

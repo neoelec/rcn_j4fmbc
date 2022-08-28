@@ -2,7 +2,7 @@
 
 #include <Arduino.h>
 
-#include "DevTty.h"
+#include "j4fDev.h"
 
 void DevTty::begin(uint8_t pin_rts, uint8_t pin_cts)
 {

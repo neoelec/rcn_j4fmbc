@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#include "Z80Mbc2Pin.h"
+#include "j4fZ80Mbc2.h"
 
 void Z80Mbc2Pin::begin(void)
 {

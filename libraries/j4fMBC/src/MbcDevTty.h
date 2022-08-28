@@ -1,8 +1,7 @@
 #ifndef __INTERNAL__MBCDEVTTY_H__
 #define __INTERNAL__MBCDEVTTY_H__
 
-#include "MbcDev.h"
-#include "MbcIo.h"
+#include "j4fMbc.h"
 
 // SERIAL RX:
 //
