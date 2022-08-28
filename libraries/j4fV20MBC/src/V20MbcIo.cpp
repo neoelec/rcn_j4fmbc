@@ -184,12 +184,12 @@ inline void V20MbcIo::__runRead(void)
     break;
 
   case 1: // AD1-AD0 = 1 (I/O read address = 0x01): SERIAL RX.
-    rd_serialrx_.run(*this);
+    __runNoneCommand(&rd_serialrx_);
     pin_->setPIN_INTR_LOW(); // INTR = LOW: Reset the INTR signal (if used).
     break;
 
   case 2: // AD1-AD0 = 2 (I/O read address = 0x02): SYSFLAGS.
-    rd_sysflags_.run(*this);
+    __runNoneCommand(&rd_sysflags_);
     break;
 
   case 3: // NOT USED - RESERVED
@@ -246,6 +246,15 @@ inline void V20MbcIo::__runHalt(void)
     Serial.println();
     halted = true;
   }
+}
+
+inline void V20MbcIo::__runNoneCommand(MbcDev *io_dev)
+{
+  uint8_t tmp_command = getCommand();
+
+  io_dev->run(*this);
+
+  setCommand(tmp_command);
 }
 
 inline void V20MbcIo::__execWriteOpcode(void)
