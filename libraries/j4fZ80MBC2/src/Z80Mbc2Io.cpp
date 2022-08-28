@@ -5,6 +5,9 @@
 #include "Z80Mbc2Cfg.h"
 #include "Z80Mbc2Io.h"
 
+#define unlikely(expr) __builtin_expect(!!(expr), 0)
+#define likely(expr) __builtin_expect(!!(expr), 1)
+
 void Z80Mbc2Io::begin(Z80Mbc2Dev &dev)
 {
   staticSysFlags_ = 0;
@@ -206,18 +209,24 @@ inline void Z80Mbc2Io::__execWriteCommand(void)
 {
   uint8_t command = getCommand();
 
-  if (command >= MbcIo::WR_BEGIN && command <= MbcIo::WR_END)
+  if (likely(command >= MbcIo::WR_BEGIN && command <= MbcIo::WR_END))
+  {
     io_dev_wr_[command - MbcIo::WR_BEGIN]->run(*this);
-  else
-    rdwr_nop_.run(*this);
+
+    if (command != MbcIo::WR_SELSECT && command != MbcIo::WR_WRITESECT)
+      setCommand(MbcIo::NO_OPERATION);
+  }
 }
 
 inline void Z80Mbc2Io::__execReadCommand(void)
 {
   uint8_t command = getCommand();
 
-  if (command >= MbcIo::RD_BEGIN && command <= MbcIo::RD_END)
+  if (likely(command >= MbcIo::RD_BEGIN && command <= MbcIo::RD_END))
+  {
     io_dev_rd_[command - MbcIo::RD_BEGIN]->run(*this);
-  else
-    rdwr_nop_.run(*this);
+
+    if (command != MbcIo::RD_DATETIME && command != MbcIo::RD_READSECT)
+      setCommand(MbcIo::NO_OPERATION);
+  }
 }

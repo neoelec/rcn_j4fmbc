@@ -25,8 +25,6 @@ inline void MbcDevRdSERIALRX::run(MbcIo &io)
 
   if (Serial.available() > 0)
     io.setData(Serial.read());
-
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 // SERIAL TX:
@@ -42,7 +40,6 @@ public:
 inline void MbcDevWrSERIALTX::run(MbcIo &io)
 {
   Serial.write(io.getData());
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 // RX IRQ FLAG:
@@ -64,8 +61,6 @@ inline void MbcDevWrRXIRQFLAG::run(MbcIo &io)
 {
   if (io.getData() & (0x1 << MbcIo::IRQ_RX))
     io.setIrq(MbcIo::IRQ_RX);
-
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 // ATXBUFF - return the current available free space (in bytes) in the TX buffer:
@@ -85,7 +80,6 @@ public:
 inline void MbcDevRdATXBUFF::run(MbcIo &io)
 {
   io.setData(Serial.availableForWrite());
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 #endif // __INTERNAL__MBCDEVTTY_H__

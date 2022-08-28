@@ -69,8 +69,6 @@ inline void MbcDisk::ioWrSELDISK(MbcIo &io)
   }
   else
     disk_error_ = ILL_DISK_NUM;
-
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 inline void MbcDisk::ioWrSELTRACK(MbcIo &io)
@@ -113,8 +111,6 @@ inline void MbcDisk::ioWrSELSECT(MbcIo &io)
     else
       disk_error_ = ILL_SECT_NUM;
   }
-
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 inline void MbcDisk::ioWrWRITESECT(MbcIo &io)
@@ -162,7 +158,6 @@ inline void MbcDisk::ioWrWRITESECT(MbcIo &io)
 inline void MbcDisk::ioRdERRDISK(MbcIo &io)
 {
   io.setData(disk_error_);
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 inline void MbcDisk::ioRdREADSECT(MbcIo &io)
@@ -206,7 +201,6 @@ inline void MbcDisk::ioRdREADSECT(MbcIo &io)
 inline void MbcDisk::ioRdSDMOUNT(MbcIo &io)
 {
   io.setData(sd_->mount());
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 inline uint32_t MbcDisk::__trackToSector(uint32_t track_number)

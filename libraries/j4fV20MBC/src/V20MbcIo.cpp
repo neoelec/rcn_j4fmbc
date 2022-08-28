@@ -5,6 +5,9 @@
 #include "V20MbcCfg.h"
 #include "V20MbcIo.h"
 
+#define unlikely(expr) __builtin_expect(!!(expr), 0)
+#define likely(expr) __builtin_expect(!!(expr), 1)
+
 void V20MbcIo::begin(V20MbcDev &dev)
 {
   staticSysFlags_ = 0;
@@ -184,12 +187,12 @@ inline void V20MbcIo::__runRead(void)
     break;
 
   case 1: // AD1-AD0 = 1 (I/O read address = 0x01): SERIAL RX.
-    __runNoneCommand(&rd_serialrx_);
+    rd_serialrx_.run(*this);
     pin_->setPIN_INTR_LOW(); // INTR = LOW: Reset the INTR signal (if used).
     break;
 
   case 2: // AD1-AD0 = 2 (I/O read address = 0x02): SYSFLAGS.
-    __runNoneCommand(&rd_sysflags_);
+    rd_sysflags_.run(*this);
     break;
 
   case 3: // NOT USED - RESERVED
@@ -248,31 +251,28 @@ inline void V20MbcIo::__runHalt(void)
   }
 }
 
-inline void V20MbcIo::__runNoneCommand(MbcDev *io_dev)
-{
-  uint8_t tmp_command = getCommand();
-
-  io_dev->run(*this);
-
-  setCommand(tmp_command);
-}
-
 inline void V20MbcIo::__execWriteOpcode(void)
 {
   uint8_t command = getCommand();
 
-  if (command >= MbcIo::WR_BEGIN && command <= MbcIo::WR_END)
+  if (likely(command >= MbcIo::WR_BEGIN && command <= MbcIo::WR_END))
+  {
     io_dev_wr_[command - MbcIo::WR_BEGIN]->run(*this);
-  else
-    rdwr_nop_.run(*this);
+
+    if (command != MbcIo::WR_SELSECT && command != MbcIo::WR_WRITESECT)
+      setCommand(MbcIo::NO_OPERATION);
+  }
 }
 
 inline void V20MbcIo::__execReadOpcode(void)
 {
   uint8_t command = getCommand();
 
-  if (command >= MbcIo::RD_BEGIN && command <= MbcIo::RD_END)
+  if (likely(command >= MbcIo::RD_BEGIN && command <= MbcIo::RD_END))
+  {
     io_dev_rd_[command - MbcIo::RD_BEGIN]->run(*this);
-  else
-    rdwr_nop_.run(*this);
+
+    if (command != MbcIo::RD_DATETIME && command != MbcIo::RD_READSECT)
+      setCommand(MbcIo::NO_OPERATION);
+  }
 }

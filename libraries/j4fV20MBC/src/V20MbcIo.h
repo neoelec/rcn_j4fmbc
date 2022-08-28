@@ -26,7 +26,6 @@ private:
   inline void __runHalt(void);
   inline void __execWriteOpcode(void);
   inline void __execReadOpcode(void);
-  inline void __runNoneCommand(MbcDev *io_dev);
 
 private:
   V20MbcPin *pin_;

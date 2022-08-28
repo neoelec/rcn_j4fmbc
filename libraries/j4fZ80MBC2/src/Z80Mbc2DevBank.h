@@ -87,8 +87,6 @@ inline void Z80Mbc2DevWrSETBANK::run(MbcIo &io)
     pin_->setPIN_BANK1_HIGH();
     break;
   }
-
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 #endif // __INTERNAL__Z80MBC2DEVBANK_H__

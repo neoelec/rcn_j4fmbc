@@ -37,8 +37,6 @@ inline void MbcDevWrUSERLED::run(MbcIo &io)
     user_->setLedOn();
   else
     user_->setLedOff();
-
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 // USER KEY:
@@ -55,7 +53,6 @@ public:
 inline void MbcDevRdUSERKEY::run(MbcIo &io)
 {
   io.setData(user_->getKey());
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 #endif // __INTERNAL__MBCDEVUSER_H__

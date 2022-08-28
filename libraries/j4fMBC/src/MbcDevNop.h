@@ -12,7 +12,6 @@ public:
 
 inline void MbcDevRdWrNOP::run(MbcIo &io)
 {
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 #endif // __INTERNAL__MBCDEVNOP_H__

@@ -37,7 +37,6 @@ inline void MbcDevRdSYSFLAGS::run(MbcIo &io)
   io_data |= (!!Serial.available()) << TTY_RX_BUF;
 
   io.setData(io_data);
-  io.setCommand(MbcIo::NO_OPERATION);
 }
 
 #endif // __MBCDEVSYSFLAGS_H__
