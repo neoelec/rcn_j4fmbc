@@ -8,7 +8,10 @@ void DevSd::begin(void)
 
   do
   {
-    error = PF.begin(&fatfs_);
+    uint8_t i = 5;
+    do {
+      error = PF.begin(&fatfs_);
+    } while (--i && (error != FR_OK));
     printError(error, MOUNT);
 
     if (error != FR_OK)
