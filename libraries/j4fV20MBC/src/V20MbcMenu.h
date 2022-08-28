@@ -17,6 +17,7 @@ public:
   void doCmdListBootMode(void);
   void doCmdToggleAutoexecEn(void);
   void doCmdChangeClockMode(void);
+  void doCmdPrintConfiguration(void);
   void doCmdAdjustRtc(void);
   void doCmdExit(void);
 

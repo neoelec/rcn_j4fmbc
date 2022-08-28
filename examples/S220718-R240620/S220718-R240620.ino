@@ -41,6 +41,7 @@ static inline void stateConfiguring(void)
 static void __menuSetup(void)
 {
   static tMenuCmdTxt prompt[] PROGMEM = "";
+  static tMenuCmdTxt txt_p[] PROGMEM = "p - Print Configuration";
   static tMenuCmdTxt txt_b[] PROGMEM = "b - Change Boot Mode";
   static tMenuCmdTxt txt_l[] PROGMEM = "l - List Boot Mode";
   static tMenuCmdTxt txt_a[] PROGMEM = "a - Toggle AUTOEXEC";
@@ -49,6 +50,8 @@ static void __menuSetup(void)
   static tMenuCmdTxt txt_x[] PROGMEM = "x - Exit";
   static tMenuCmdTxt txt__[] PROGMEM = "? - Help";
   static stMenuCmd menu_list[] = {
+      {txt_p, 'p', []()
+       { menu.doCmdPrintConfiguration(); }},
       {txt_b, 'b', []()
        { menu.doChangeBootMode(); }},
       {txt_l, 'l', []()
@@ -77,7 +80,8 @@ static void __menuSetup(void)
 
 static void __menuRun(void)
 {
-  while (!menu.isDone()) {
+  while (!menu.isDone())
+  {
     uint8_t cmd = menu_cmd->UserRequest();
 
     menu.blinkLed();

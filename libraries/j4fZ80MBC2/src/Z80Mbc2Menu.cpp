@@ -170,6 +170,14 @@ void Z80Mbc2Menu::__adjustRtc(stDateTimeGroup &dtg)
   rtc_->adjust(dt);
 }
 
+void Z80Mbc2Menu::doCmdPrintConfiguration(void)
+{
+  Serial.println();
+  cfg_.printCfg();
+  Serial.println();
+  menu_cmd_.giveCmdPrompt();
+}
+
 void Z80Mbc2Menu::doCmdExit(void)
 {
   done_ = true;

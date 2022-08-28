@@ -170,6 +170,14 @@ void V20MbcMenu::__adjustRtc(stDateTimeGroup &dtg)
   rtc_->adjust(dt);
 }
 
+void V20MbcMenu::doCmdPrintConfiguration(void)
+{
+  Serial.println();
+  cfg_.printCfg();
+  Serial.println();
+  menu_cmd_.giveCmdPrompt();
+}
+
 void V20MbcMenu::doCmdExit(void)
 {
   done_ = true;
