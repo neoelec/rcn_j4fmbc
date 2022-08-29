@@ -1,6 +1,6 @@
 /* ------------------------------------------------------------------------------
 
-S220718-R120519_DEVEL2 - HW ref: A040618
+S220718-R120519_DEVEL3 - HW ref: A040618
 
 
 
@@ -66,11 +66,12 @@ S220718-R190918   Added support for CP/M 3.
                   Fixed a bug in the manual RTC setting.
 S220718-R260119   Changed the default serial speed to 115200 bps.
                   Added support for xmodem protocol (extended serial Rx buffer check and  
-                   two new flags into the SYSFLAGS opcode for full 8 bit serial I/O control.
-                  Added support for uTerm (A071218-R250119) reset at boot time.
+                   two new flags into the SYSFLAGS opcode for full 8 bit serial I/O control).
+                  Added support for uTerm (A071218-R250119 and following revisions) reset at boot time.
 S220718-R120519   Added FUZIX support
                   DEVEL1: added available space check of serial Tx buffer 
                   DEVEL2: added 10Hz interrupt
+                  DEVEL3: added DEBUG2
                   TBD ********************************************************************************************
 
 --------------------------------------------------------------------------------- */
@@ -206,6 +207,9 @@ const String  compTimeStr  = __TIME__;    // Compile timestamp string
 const String  compDateStr  = __DATE__;    // Compile datestamp string
 const byte    daysOfMonth[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 const byte    debug        = 0;           // Debug off = 0, on = 1, on = 2 with interrupt trace
+
+const byte    DEBUG2 = 0; // *************************************************************************************
+
 const byte    bootModeAddr = 10;          // Internal EEPROM address for boot mode storage
 const byte    autoexecFlagAddr = 12;      // Internal EEPROM address for AUTOEXEC flag storage
 const byte    clockModeAddr = 13;         // Internal EEPROM address for the Z80 clock high/low speed switch
@@ -411,7 +415,7 @@ void setup()
   
   // Print some system information
   Serial.begin(115200);  
-  Serial.println(F("\r\n\nZ80-MBC2 - A040618\r\nIOS - I/O Subsystem - S220718-R120519_DEVEL2\r\n"));  // **********************
+  Serial.println(F("\r\n\nZ80-MBC2 - A040618\r\nIOS - I/O Subsystem - S220718-R120519_DEVEL3\r\n"));  // **********************
 
   // Print if the input serial buffer is 128 bytes wide (this is needed for xmodem protocol support)
   if (SERIAL_RX_BUFFER_SIZE >= 128) Serial.println(F("IOS: Found extended serial Rx buffer"));
@@ -599,7 +603,7 @@ void setup()
         case 4:                                     // FUZIX ********************************************************
         fileNameSD = FUZIXFN;
         BootStrAddr = FUZSTRADDR;
-        Z80IntRx = 1;                             // Enable Z80 Rx INT_ signal generation (Z80 M1 INT I/O)
+        Z80IntRx = 0;                             // Disaable Z80 Rx INT_ signal generation (Z80 M1 INT I/O) **************
         Z80Int10Hz = 0;                           // Disaable Z80 SysTick INT_ signal generation (Z80 M1 INT I/O) *************************************
       break;
       }
@@ -1276,8 +1280,24 @@ void loop()
           {
             ioData = Serial.read();
             LastRxIsEmpty = 0;                // Reset the "Last Rx char was empty" flag
+
+            // *************************************************************************************** DEBUG
+
+            if (DEBUG2) Serial.println(F("\r\n\** DEBUG: VALID RX **"));
+
+            // *************************************************************************************** DEBUG END
           }
-          else LastRxIsEmpty = 1;             // Set the "Last Rx char was empty" flag
+          else 
+          {
+            LastRxIsEmpty = 1;             // Set the "Last Rx char was empty" flag
+            
+            // *************************************************************************************** DEBUG
+
+            if (DEBUG2) Serial.println(F("\r\n\** DEBUG: NOT VALID RX **"));
+
+            // *************************************************************************************** DEBUG END
+          }
+          
           digitalWrite(INT_, HIGH);           // Reset the INT_ signal
           irqStatus = irqStatus & B11111110;  // Reset the serial Rx IRQ staus bit (see SYSIRQ Opcode)
         }
@@ -1357,6 +1377,7 @@ void loop()
 
           case  0x83:
             // SYSFLAGS (Various system flags for the OS):
+            //
             //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
             //                            ---------------------------------------------------------
             //                              X  X  X  X  X  X  X  0    AUTOEXEC not enabled
@@ -1371,10 +1392,17 @@ void loop()
             // NOTE: Currently only D0-D3 are used
 
             ioData = autoexecFlag | (foundRTC << 1) | ((Serial.available() > 0) << 2) | ((LastRxIsEmpty > 0) << 3);
+
+            // *************************************************************************************** DEBUG
+
+            if (DEBUG2) Serial.println(F("\r\n\** DEBUG: SYSFLAGS **"));
+
+            // *************************************************************************************** DEBUG END
           break;
 
           case  0x84:
             // DATETIME (Read date/time and temperature from the RTC. Binary values): 
+            //
             //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
             //                            ---------------------------------------------------------
             //                I/O DATA 0   D7 D6 D5 D4 D3 D2 D1 D0    seconds [0..59]     (1st data byte)
@@ -1538,8 +1566,8 @@ void loop()
             //                            ---------------------------------------------------------
             //                             D7 D6 D5 D4 D3 D2 D1 D0    free space in bytes (binary)
             //
-            // NOTE: This opcode is intended to avoid delays in serial Tx operations, as the IOS hold the Z80
-            //       in a wait status if the TX buffer is full.
+            // NOTE: This opcode is intended to avoid delays in serial Tx operations, as the IOS holds the Z80
+            //       in a wait status if the TX buffer is full. This is no good in multitasking enviroments.
             
             ioData = Serial.availableForWrite() ;
           break;
