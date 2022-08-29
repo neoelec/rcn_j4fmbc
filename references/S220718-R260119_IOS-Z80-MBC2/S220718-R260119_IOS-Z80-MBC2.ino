@@ -1,6 +1,13 @@
 /* ------------------------------------------------------------------------------
 
-S220718-R260119 - HW ref: A040618
+S220718-R120519_DEVEL1 - HW ref: A040618
+
+
+
+**************** ONLY FOR TESTING & DEVELOPMENTE!!!! DO NOT USE!!! ****************
+
+
+
 
 IOS - I/O  for Z80-MBC2 (Multi Boot Computer - Z80 128kB RAM @ 4/8Mhz @ Fosc = 16MHz)
 
@@ -59,8 +66,10 @@ S220718-R190918   Added support for CP/M 3.
                   Fixed a bug in the manual RTC setting.
 S220718-R260119   Changed the default serial speed to 115200 bps.
                   Added support for xmodem protocol (extended serial Rx buffer check and  
-                   two new flags into the SYSFLAG opcode for full 8 bit serial I/O control.
+                   two new flags into the SYSFLAGS opcode for full 8 bit serial I/O control.
                   Added support for uTerm (A071218-R250119) reset at boot time.
+S220718-R120519   Added FUZIX support
+                  TBD ********************************************************************************************
 
 --------------------------------------------------------------------------------- */
 
@@ -138,6 +147,7 @@ S220718-R260119   Changed the default serial speed to 115200 bps.
 #define   CPMFN         "CPM22.BIN"
 #define   QPMFN         "QPMLDR.BIN"
 #define   CPM3FN        "CPMLDR.COM"      // CP/M 3 CPMLDR.COM loader
+#define   FUZIXFN       "FUZIX.BIN"       // FUZIX loader *******************************************************
 #define   AUTOFN        "AUTOBOOT.BIN"
 #define   Z80DISK       "DSxNyy.DSK"      // Generic Z80 disk name (from DS0N00.DSK to DS9N99.DSK)
 #define   DS_OSNAME     "DSxNAM.DAT"      // File with the OS name for Disk Set "x" (from DS0NAM.DAT to DS9NAM.DAT)
@@ -147,6 +157,7 @@ S220718-R260119   Changed the default serial speed to 115200 bps.
 #define   CPMSTRADDR    (CPM22CBASE - 32) // Starting address for CP/M 2.2
 #define   QPMSTRADDR    0x80              // Starting address for the QP/M 2.71 loader
 #define   CPM3STRADDR   0x100             // Starting address for the CP/M 3 loader
+#define   FUZSTRADDR    0x0000            // Starting address for the FUZIX loader  ******************************
 #define   AUTSTRADDR    0x0000            // Starting address for the AUTOBOOT.BIN file
 
 // ------------------------------------------------------------------------------
@@ -199,7 +210,7 @@ const byte    clockModeAddr = 13;         // Internal EEPROM address for the Z80
                                           //  (1 = low speed, 0 = high speed)
 const byte    diskSetAddr  = 14;          // Internal EEPROM address for the current Disk Set [0..9]
 const byte    maxDiskNum   = 99;          // Max number of virtual disks
-const byte    maxDiskSet   = 3;           // Number of configured Disk Sets
+const byte    maxDiskSet   = 4;           // Number of configured Disk Sets *************************************
 
 // Z80 programs images into flash and related constants
 const word  boot_A_StrAddr = 0xfd10;      // Payload A image starting address (flash)
@@ -393,8 +404,8 @@ void setup()
   if (Wire.endTransmission() == 0) moduleGPIO = 1;// Set to 1 if GPIO Module is found
   
   // Print some system information
-  Serial.begin(115200);
-  Serial.println(F("\r\n\nZ80-MBC2 - A040618\r\nIOS - I/O Subsystem - S220718-R260119\r\n"));
+  Serial.begin(115200);  
+  Serial.println(F("\r\n\nZ80-MBC2 - A040618\r\nIOS - I/O Subsystem - S220718-R120519_DEVEL1\r\n"));  // **********************
 
   // Print if the input serial buffer is 128 bytes wide (this is needed for xmodem protocol support)
   if (SERIAL_RX_BUFFER_SIZE >= 128) Serial.println(F("IOS: Found extended serial Rx buffer"));
@@ -570,6 +581,12 @@ void setup()
       case 2:                                     // CP/M 3.0
         fileNameSD = CPM3FN;
         BootStrAddr = CPM3STRADDR;
+      break;
+
+      case 3:                                     // FUZIX ***********************************************
+        fileNameSD = FUZIXFN;
+        BootStrAddr = FUZSTRADDR;
+        Z80IntEnFlag = 1;                         // Enable INT_ signal generation (Z80 M1 INT I/O)
       break;
       }
     break;
@@ -790,6 +807,7 @@ void loop()
       // Opcode 0x85  ERRDISK         1
       // Opcode 0x86  READSECT        512
       // Opcode 0x87  SDMOUNT         1
+      // Opcode 0x88  ATXBUFF         1   ***********************************************************************
       // Opcode 0xFF  No operation    1
       //
       // See the following lines for the Opcodes details.
@@ -1234,7 +1252,7 @@ void loop()
           // NOTE 1: If there is no input char, a value 0xFF is forced as input char.
           // NOTE 2: The INT_ signal is always reset (set to HIGH) after this I/O operation.
           // NOTE 3: This is the only I/O that do not require any previous STORE OPCODE operation (for fast polling).
-          // NOTE 4: A "RX buffer empty" flag and a "Last Rx char was empty" flag are available in the SYSFLAG opcode 
+          // NOTE 4: A "RX buffer empty" flag and a "Last Rx char was empty" flag are available in the SYSFLAGS opcode 
           //         to allow 8 bit I/O.
           //
           ioData = 0xFF;
@@ -1494,7 +1512,21 @@ void loop()
             //         ERRDISK opcode
 
             ioData = mountSD(&filesysSD);
-          break;          
+          break;
+
+          case  0x88:
+            // ATXBUFF - return the current available free space (in bytes) in the TX buffer: ********************** NEW
+            //
+            //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
+            //                            ---------------------------------------------------------
+            //                             D7 D6 D5 D4 D3 D2 D1 D0    free space in bytes (binary)
+            //
+            // NOTE: This opcode is intended to avoid delays in serial Tx operations, as the IOS hold the Z80
+            //       in a wait status if the TX buffer is full.
+            
+            ioData = Serial.availableForWrite() ;
+          break;
+                  
           }
           if ((ioOpcode != 0x84) && (ioOpcode != 0x86)) ioOpcode = 0xFF;  // All done for the single byte opcodes. 
                                                                           //  Set ioOpcode = "No operation"
