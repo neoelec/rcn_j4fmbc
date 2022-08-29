@@ -2,6 +2,8 @@
 
 #include "j4fDev.h"
 
+#define PIN_nSS 4 // PB4 pin 5    SD SPI
+
 void DevSd::begin(void)
 {
   FRESULT error;
@@ -9,8 +11,9 @@ void DevSd::begin(void)
   do
   {
     uint8_t i = 5;
-    do {
-      error = PF.begin(&fatfs_);
+    do
+    {
+      error = PFF3a.begin(&fatfs_, PIN_nSS);
     } while (--i && (error != FR_OK));
     printError(error, MOUNT);
 
@@ -23,7 +26,7 @@ uint8_t DevSd::mount(void)
 {
   FRESULT error;
 
-  error = PF.begin(&fatfs_);
+  error = PFF3a.begin(&fatfs_, PIN_nSS);
 
   return static_cast<uint8_t>(error & 0xFF);
 }
@@ -32,7 +35,7 @@ uint8_t DevSd::open(const char *file_name)
 {
   FRESULT error;
 
-  error = PF.open(file_name);
+  error = PFF3a.open(file_name);
 
   return static_cast<uint8_t>(error & 0xFF);
 }

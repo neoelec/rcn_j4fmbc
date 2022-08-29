@@ -1,12 +1,7 @@
 #ifndef __INTERNAL__DEVSD_H__
 #define __INTERNAL__DEVSD_H__
 
-#include <pff.h>
-#include <pffArduino.h>
-
-#if (SD_CS_PIN != 4)
-#error "SD_CS_PIN should be 4 in pffArduino.h"
-#endif
+#include <PFF3a.h>
 
 class DevSd
 {
@@ -43,7 +38,7 @@ inline uint8_t DevSd::read(void *buf, uint8_t sz_to_read, uint8_t &__sz_read)
   UINT sz_read;
   FRESULT error;
 
-  error = PF.readFile(buf, sz_to_read, &sz_read);
+  error = PFF3a.read(buf, sz_to_read, &sz_read);
 
   __sz_read = static_cast<uint8_t>(sz_read);
 
@@ -55,7 +50,7 @@ inline uint8_t DevSd::write(const void *buf, uint8_t sz_to_write, uint8_t &__sz_
   UINT sz_wrote;
   FRESULT error;
 
-  error = PF.writeFile(buf, sz_to_write, &sz_wrote);
+  error = PFF3a.write(buf, sz_to_write, &sz_wrote);
 
   __sz_wrote = static_cast<uint8_t>(sz_wrote);
 
@@ -66,7 +61,7 @@ inline uint8_t DevSd::lseek(uint32_t sz_offset)
 {
   FRESULT error;
 
-  error = PF.seek(sz_offset);
+  error = PFF3a.lseek(sz_offset);
 
   return static_cast<uint8_t>(error);
 }
