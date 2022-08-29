@@ -1,6 +1,6 @@
 /* ------------------------------------------------------------------------------
 
-S220718-R120519_DEVEL3 - HW ref: A040618
+S220718-R120519_DEVEL4 - HW ref: A040618
 
 
 
@@ -68,10 +68,13 @@ S220718-R260119   Changed the default serial speed to 115200 bps.
                   Added support for xmodem protocol (extended serial Rx buffer check and  
                    two new flags into the SYSFLAGS opcode for full 8 bit serial I/O control).
                   Added support for uTerm (A071218-R250119 and following revisions) reset at boot time.
-S220718-R120519   Added FUZIX support
-                  DEVEL1: added available space check of serial Tx buffer 
-                  DEVEL2: added 10Hz interrupt
+S220718-R120519   DEVEL1: Added FUZIX experimental support
+                          added available space check of serial Tx buffer
+                          added Serial Rx IRQ generation
+                  DEVEL2: added Systick interrupt
                   DEVEL3: added DEBUG2
+                  DEVEL4: added SETIRQ Opcode to enable/disable IRQ triggers
+                          added SETTICK Opcode to set/change the Sysytick time
                   TBD ********************************************************************************************
 
 --------------------------------------------------------------------------------- */
@@ -217,7 +220,6 @@ const byte    clockModeAddr = 13;         // Internal EEPROM address for the Z80
 const byte    diskSetAddr  = 14;          // Internal EEPROM address for the current Disk Set [0..9]
 const byte    maxDiskNum   = 99;          // Max number of virtual disks
 const byte    maxDiskSet   = 5;           // Number of configured Disk Sets *****************************************
-const byte    sysTickTime  = 100;         // Period in milliseconds of the Z80 Systick interrupt (if enabled) ********
 
 // Z80 programs images into flash and related constants
 const word  boot_A_StrAddr = 0xfd10;      // Payload A image starting address (flash)
@@ -283,8 +285,8 @@ byte *        BootImage;                  // Pointer to selected flash payload a
 word          BootImageSize  = 0;         // Size of the selected flash payload array (image) to boot
 word          BootStrAddr;                // Starting address of the selected program to boot (from flash or SD)
 byte          Z80IntRx       = 0;         // Z80 serial Rx INT_ enable flag (0 = disabled, 1 = enabled)  *************
-byte          Z80Int10Hz     = 0;         // Z80 Systick INT_ enable flag (0 = disabled, 1 = enabled) ***********************
-unsigned long timeStamp;                  // Timestamp for led blinking and Z80 Systick interrupt *********************
+byte          Z80IntSysTick  = 0;         // Z80 Systick INT_ enable flag (0 = disabled, 1 = enabled) ***********************
+unsigned long timeStamp      = 0;         // Timestamp for led blinking and Z80 Systick interrupt *********************
 char          inChar;                     // Input char from serial
 byte          iCount;                     // Temporary variable (counter)
 byte          clockMode;                  // Z80 clock HI/LO speed selector (0 = 8/10MHz, 1 = 4/5MHz)
@@ -292,6 +294,7 @@ byte          LastRxIsEmpty;              // "Last Rx char was empty" flag. Is s
                                           //  when the Rx buffer was empty
 byte          irqStatus      = 0;         // Store the interrupr status byte (every bit is the status of a different 
                                           //  interrupt. See the SYSIRQ opcode)
+byte          sysTickTime  = 100;         // Period in milliseconds of the Z80 Systick interrupt (if enabled) ********                                          
 
 // DS3231 RTC variables
 byte          foundRTC;                   // Set to 1 if RTC is found, 0 otherwise
@@ -415,7 +418,7 @@ void setup()
   
   // Print some system information
   Serial.begin(115200);  
-  Serial.println(F("\r\n\nZ80-MBC2 - A040618\r\nIOS - I/O Subsystem - S220718-R120519_DEVEL3\r\n"));  // **********************
+  Serial.println(F("\r\n\nZ80-MBC2 - A040618\r\nIOS - I/O Subsystem - S220718-R120519_DEVEL4\r\n"));  // **********************
 
   // Print if the input serial buffer is 128 bytes wide (this is needed for xmodem protocol support)
   if (SERIAL_RX_BUFFER_SIZE >= 128) Serial.println(F("IOS: Found extended serial Rx buffer"));
@@ -597,14 +600,14 @@ void setup()
         fileNameSD = FUZIXFN;
         BootStrAddr = FUZSTRADDR;
         Z80IntRx = 1;                             // Enable Z80 Rx INT_ signal generation (Z80 M1 INT I/O)
-        Z80Int10Hz = 1;                           // Enable Z80 SysTick INT_ signal generation (Z80 M1 INT I/O) *************************************
+        Z80IntSysTick = 1;                        // Enable Z80 SysTick INT_ signal generation (Z80 M1 INT I/O) *************************************
       break;
 
         case 4:                                     // FUZIX ********************************************************
         fileNameSD = FUZIXFN;
         BootStrAddr = FUZSTRADDR;
         Z80IntRx = 0;                             // Disaable Z80 Rx INT_ signal generation (Z80 M1 INT I/O) **************
-        Z80Int10Hz = 0;                           // Disaable Z80 SysTick INT_ signal generation (Z80 M1 INT I/O) *************************************
+        Z80IntSysTick = 0;                        // Disaable Z80 SysTick INT_ signal generation (Z80 M1 INT I/O) *************************************
       break;
       }
     break;
@@ -810,6 +813,8 @@ void loop()
       // Opcode 0x0B  SELSECT         1  
       // Opcode 0x0C  WRITESECT       512
       // Opcode 0x0D  SETBANK         1
+      // Opcode 0x0E  SETIRQ          1   ***********************************************************************
+      // Opcode 0x0F  SETTICK         1   ***********************************************************************
       // Opcode 0xFF  No operation    1
       //
       //
@@ -1230,7 +1235,50 @@ void loop()
             break;  
           }
         break;
-        
+
+        case  0x0E:
+            // SETIRQ - enable/disable the IRQ generation ********************************************************* NEW
+            //
+            //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
+            //                            ---------------------------------------------------------
+            //                              X  X  X  X  X  X  X  0    Serial Rx IRQ not enabled
+            //                              X  X  X  X  X  X  X  1    Serial Rx IRQ enabled
+            //                              X  X  X  X  X  X  0  X    Systick IRQ not enabled
+            //                              X  X  X  X  X  X  1  X    Systick IRQ enabled
+            //
+            //
+            // The INT_ signal is shared among various interrupt requests. This allows to use the simplified 
+            //  Mode 1 scheme of the Z80 CPU (fixed jump to 0x0038 on INT_ signal active) with multiple interrupt causes.
+            // The SETIRQ purpose is to enable/disable the generation of an IRQ (using the INT_ signal)
+            //  selecting wich event you want enable.
+            // When a IRQ is enabled you have to serve it on the Z80 side with a ISR (Interrupt Service Routine).
+            // Inside the ISR code, you have to read the SYSIRQ Opcode to know the exact causes of the interrupt (see the 
+            //  SYSIRQ Opcode) because multiple causes/bits could be active, so your ISR must be written to check and serve 
+            //  them all.
+            //
+            // NOTE 1: Only D0 and D1 are currently used.
+            // NOTE 2: At reset time all the IRQ triggers are normally disabled (unless they are enabled for special
+            //         boot cases).
+
+            Z80IntRx = ioData & 1;                // Enable/disable the Systick IRQ generation
+            Z80IntSysTick = (ioData & (1 << 1)) >> 1;  // Enable/disable the Serial Rx IRQ generation
+          break;
+
+        case  0x0F:
+            // SETTICK - set the Systick timer time (milliseconds) ********************************************************* NEW
+            //
+            //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
+            //                            ---------------------------------------------------------
+            //                             D7 D6 D5 D4 D3 D2 D1 D0    Systick time (binary) [1..255]
+            //
+            // Set/change the time (millisecond) used for the Systick timer.
+            // At reset time the default value is 100ms.
+            // See SETIRQ and SYSIRQ Opcodes for more info.
+            //
+            // NOTE: If the time is 0 milliseconds the set operation is ignored.
+
+            if (ioData >0) sysTickTime = ioData;
+          break;
         }
         if ((ioOpcode != 0x0A) && (ioOpcode != 0x0C)) ioOpcode = 0xFF;    // All done for the single byte opcodes. 
                                                                           //  Set ioOpcode = "No operation"
@@ -1595,7 +1643,8 @@ void loop()
             //
             // NOTE 1: Only D0 and D1 "interrupt status bit" are currently used.
             // NOTE 2: After the SYSIRQ call all the "interrupt status bits" are cleared.
-            // NOTE 3: The INT_ signal is always reset (set to HIGH) after this I/O operation.
+            // NOTE 3: The INT_ signal is always reset (set to HIGH) after this I/O operation, so you have to call it
+            //         always from inside the ISR (on the Z80 side) before to re-enable the Z80 IRQ again.
             
             ioData = irqStatus;
             irqStatus = 0;                        // Reset all the "interrupt status bits"
@@ -1646,15 +1695,17 @@ void loop()
   }
 
   // ************************************************************************************************* NEW
-  if (Z80Int10Hz)
+  if (Z80IntSysTick)
   // Systick interrupt generation is enabled. Check if the INT_ signal must be activated
   {
-    if ((millis() - timeStamp) > sysTickTime)
+    //if ((millis() - timeStamp) > sysTickTime)
+    if ((micros() - timeStamp) > ((long unsigned) (sysTickTime) * 1000))
     // <sysTickTime> milliseconds are elapsed, so a Systick interrupt is required
     {
       digitalWrite(INT_, LOW);
       irqStatus = irqStatus | B00000010;            // Set the Systick IRQ status bit (see SYSIRQ Opcode)
-      timeStamp = millis();
+      //timeStamp = millis();
+      timeStamp = micros();
     }
   }
   // ************************************************************************************************* END
