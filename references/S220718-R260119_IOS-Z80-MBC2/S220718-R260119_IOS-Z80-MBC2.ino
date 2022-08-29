@@ -1,10 +1,10 @@
 /* ------------------------------------------------------------------------------
 
-S220718-R120519_DEVEL1 - HW ref: A040618
+S220718-R120519_DEVEL2 - HW ref: A040618
 
 
 
-**************** ONLY FOR TESTING & DEVELOPMENTE!!!! DO NOT USE!!! ****************
+**************** ONLY FOR TESTING & DEVELOPMENT!!!! DO NOT USE!!! ****************
 
 
 
@@ -69,6 +69,8 @@ S220718-R260119   Changed the default serial speed to 115200 bps.
                    two new flags into the SYSFLAGS opcode for full 8 bit serial I/O control.
                   Added support for uTerm (A071218-R250119) reset at boot time.
 S220718-R120519   Added FUZIX support
+                  DEVEL1: added available space check of serial Tx buffer 
+                  DEVEL2: added 10Hz interrupt
                   TBD ********************************************************************************************
 
 --------------------------------------------------------------------------------- */
@@ -210,7 +212,8 @@ const byte    clockModeAddr = 13;         // Internal EEPROM address for the Z80
                                           //  (1 = low speed, 0 = high speed)
 const byte    diskSetAddr  = 14;          // Internal EEPROM address for the current Disk Set [0..9]
 const byte    maxDiskNum   = 99;          // Max number of virtual disks
-const byte    maxDiskSet   = 4;           // Number of configured Disk Sets *************************************
+const byte    maxDiskSet   = 5;           // Number of configured Disk Sets *****************************************
+const byte    sysTickTime  = 100;         // Period in milliseconds of the Z80 Systick interrupt (if enabled) ********
 
 // Z80 programs images into flash and related constants
 const word  boot_A_StrAddr = 0xfd10;      // Payload A image starting address (flash)
@@ -275,13 +278,16 @@ byte          bootMode       = 0;         // Set the program to boot (from flash
 byte *        BootImage;                  // Pointer to selected flash payload array (image) to boot
 word          BootImageSize  = 0;         // Size of the selected flash payload array (image) to boot
 word          BootStrAddr;                // Starting address of the selected program to boot (from flash or SD)
-byte          Z80IntEnFlag   = 0;         // Z80 INT_ enable flag (0 = No INT_ used, 1 = INT_ used for I/O)
-unsigned long timeStamp;                  // Timestamp for led blinking
+byte          Z80IntRx       = 0;         // Z80 serial Rx INT_ enable flag (0 = disabled, 1 = enabled)  *************
+byte          Z80Int10Hz     = 0;         // Z80 Systick INT_ enable flag (0 = disabled, 1 = enabled) ***********************
+unsigned long timeStamp;                  // Timestamp for led blinking and Z80 Systick interrupt *********************
 char          inChar;                     // Input char from serial
 byte          iCount;                     // Temporary variable (counter)
 byte          clockMode;                  // Z80 clock HI/LO speed selector (0 = 8/10MHz, 1 = 4/5MHz)
 byte          LastRxIsEmpty;              // "Last Rx char was empty" flag. Is set when a serial Rx operation was done
-                                          // when the Rx buffer was empty
+                                          //  when the Rx buffer was empty
+byte          irqStatus      = 0;         // Store the interrupr status byte (every bit is the status of a different 
+                                          //  interrupt. See the SYSIRQ opcode)
 
 // DS3231 RTC variables
 byte          foundRTC;                   // Set to 1 if RTC is found, 0 otherwise
@@ -405,7 +411,7 @@ void setup()
   
   // Print some system information
   Serial.begin(115200);  
-  Serial.println(F("\r\n\nZ80-MBC2 - A040618\r\nIOS - I/O Subsystem - S220718-R120519_DEVEL1\r\n"));  // **********************
+  Serial.println(F("\r\n\nZ80-MBC2 - A040618\r\nIOS - I/O Subsystem - S220718-R120519_DEVEL2\r\n"));  // **********************
 
   // Print if the input serial buffer is 128 bytes wide (this is needed for xmodem protocol support)
   if (SERIAL_RX_BUFFER_SIZE >= 128) Serial.println(F("IOS: Found extended serial Rx buffer"));
@@ -557,7 +563,7 @@ void setup()
     case 0:                                       // Load Basic from SD
       fileNameSD = BASICFN;
       BootStrAddr = BASSTRADDR;
-      Z80IntEnFlag = 1;                           // Enable INT_ signal generation (Z80 M1 INT I/O)
+      Z80IntRx = 1;                               // Enable Z80 Rx INT_ signal generation (Z80 M1 INT I/O)
     break;
     
     case 1:                                       // Load Forth from SD
@@ -583,10 +589,18 @@ void setup()
         BootStrAddr = CPM3STRADDR;
       break;
 
-      case 3:                                     // FUZIX ***********************************************
+      case 3:                                     // FUZIX ********************************************************
         fileNameSD = FUZIXFN;
         BootStrAddr = FUZSTRADDR;
-        Z80IntEnFlag = 1;                         // Enable INT_ signal generation (Z80 M1 INT I/O)
+        Z80IntRx = 1;                             // Enable Z80 Rx INT_ signal generation (Z80 M1 INT I/O)
+        Z80Int10Hz = 1;                           // Enable Z80 SysTick INT_ signal generation (Z80 M1 INT I/O) *************************************
+      break;
+
+        case 4:                                     // FUZIX ********************************************************
+        fileNameSD = FUZIXFN;
+        BootStrAddr = FUZSTRADDR;
+        Z80IntRx = 1;                             // Enable Z80 Rx INT_ signal generation (Z80 M1 INT I/O)
+        Z80Int10Hz = 0;                           // Disaable Z80 SysTick INT_ signal generation (Z80 M1 INT I/O) *************************************
       break;
       }
     break;
@@ -808,6 +822,7 @@ void loop()
       // Opcode 0x86  READSECT        512
       // Opcode 0x87  SDMOUNT         1
       // Opcode 0x88  ATXBUFF         1   ***********************************************************************
+      // Opcode 0x89  SYSIRQ          1   ***********************************************************************
       // Opcode 0xFF  No operation    1
       //
       // See the following lines for the Opcodes details.
@@ -1254,6 +1269,7 @@ void loop()
           // NOTE 3: This is the only I/O that do not require any previous STORE OPCODE operation (for fast polling).
           // NOTE 4: A "RX buffer empty" flag and a "Last Rx char was empty" flag are available in the SYSFLAGS opcode 
           //         to allow 8 bit I/O.
+          // NOTE 5: The serial Rx IRQ status bit is always reset after this I/O operation.
           //
           ioData = 0xFF;
           if (Serial.available() > 0)
@@ -1262,7 +1278,8 @@ void loop()
             LastRxIsEmpty = 0;                // Reset the "Last Rx char was empty" flag
           }
           else LastRxIsEmpty = 1;             // Set the "Last Rx char was empty" flag
-          digitalWrite(INT_, HIGH);
+          digitalWrite(INT_, HIGH);           // Reset the INT_ signal
+          irqStatus = irqStatus & B11111110;  // Reset the serial Rx IRQ staus bit (see SYSIRQ Opcode)
         }
         else
         // .........................................................................................................
@@ -1526,6 +1543,36 @@ void loop()
             
             ioData = Serial.availableForWrite() ;
           break;
+
+          case  0x89:
+            // SYSIRQ - return the "interrupt status byte": ********************************************************* NEW
+            //
+            //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
+            //                            ---------------------------------------------------------
+            //                              X  X  X  X  X  X  X  0    Serial Rx IRQ not set
+            //                              X  X  X  X  X  X  X  1    Serial Rx IRQ set
+            //                              X  X  X  X  X  X  0  X    Systick IRQ not set
+            //                              X  X  X  X  X  X  1  X    Systick IRQ set
+            //
+            //
+            // The INT_ signal is shared among various interrupt requests. This allows to use the simplified 
+            //  Mode 1 scheme of the Z80 CPU (fixed jump to 0x0038 on INT_ signal active) with multiple interrupt causes.
+            // The SYSIRQ purpose is to allow the Z80 CPU to know the exact causes of the interrupt reading the 
+            //  "interrupt status byte" that contains up to eight "interrupt status bits". So the ISR (Interrupt Service 
+            //  Routine) should be structured to read at first the "interrupt status byte" using the SYSIRQ Opcode, 
+            //  and than execute the needed actions before return to the normal execution.
+            // Note that multiple causes/bits could be active.
+            // 
+            //
+            //
+            // NOTE 1: Only D0 and D1 "interrupt status bit" are currently used.
+            // NOTE 2: After the SYSIRQ call all the "interrupt status bits" are cleared.
+            // NOTE 3: The INT_ signal is always reset (set to HIGH) after this I/O operation.
+            
+            ioData = irqStatus;
+            irqStatus = 0;                        // Reset all the "interrupt status bits"
+            digitalWrite(INT_, HIGH);             // Reset the INT_ signal
+          break;
                   
           }
           if ((ioOpcode != 0x84) && (ioOpcode != 0x86)) ioOpcode = 0xFF;  // All done for the single byte opcodes. 
@@ -1569,6 +1616,20 @@ void loop()
         digitalWrite(BUSREQ_, HIGH);              // Resume Z80 from DMA
       }
   }
+
+  // ************************************************************************************************* NEW
+  if (Z80Int10Hz)
+  // Systick interrupt generation is enabled. Check if the INT_ signal must be activated
+  {
+    if ((millis() - timeStamp) > sysTickTime)
+    // <sysTickTime> milliseconds are elapsed, so a Systick interrupt is required
+    {
+      digitalWrite(INT_, LOW);
+      irqStatus = irqStatus | B00000010;            // Set the Systick IRQ status bit (see SYSIRQ Opcode)
+      timeStamp = millis();
+    }
+  }
+  // ************************************************************************************************* END
 }
 
 
@@ -1593,7 +1654,11 @@ void printBinaryByte(byte value)
 void serialEvent()
 // Set INT_ to ACTIVE if there are received chars from serial to read and if the interrupt generation is enabled
 {
-  if ((Serial.available()) && Z80IntEnFlag) digitalWrite(INT_, LOW);
+  if ((Serial.available()) && Z80IntRx)
+  {
+    digitalWrite(INT_, LOW);
+    irqStatus = irqStatus | B00000001;            // Set the serial Rx IRQ status bit (see SYSIRQ Opcode) *************
+  }
 }
 
 // ------------------------------------------------------------------------------
