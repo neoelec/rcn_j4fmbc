@@ -52,7 +52,7 @@ void DevRtc::__printDateTime(DateTime &date_time)
 
 void DevRtc::__printTemperature(void)
 {
-  int celsius_10 = static_cast<int>(ds3231_.getTemperature() * 10.0);
+  int celsius_10 = static_cast<int>(ds3231_.getTemperature() * 10.0f);
 
   Serial.printf(F("%d.%d C"), celsius_10 / 10, celsius_10 % 10);
   Serial.println();
