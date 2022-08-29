@@ -1,8 +1,11 @@
+#pragma GCC optimize("O2")
+
 /*-----------------------------------------------------------------------*/
 /* Low level disk I/O module skeleton for Petit FatFs (C)ChaN, 2014      */
 /*-----------------------------------------------------------------------*/
 
 #include "diskio.h"
+#include "diskIoArduino.h"
 
 
 /*-----------------------------------------------------------------------*/
@@ -13,7 +16,7 @@ DSTATUS disk_initialize (void)
 {
 	DSTATUS stat;
 
-	// Put your code here
+	stat = glue_disk_initialize();
 
 	return stat;
 }
@@ -33,7 +36,7 @@ DRESULT disk_readp (
 {
 	DRESULT res;
 
-	// Put your code here
+	res = glue_disk_readp(buff, sector, offset, count);
 
 	return res;
 }
@@ -44,30 +47,16 @@ DRESULT disk_readp (
 /* Write Partial Sector                                                  */
 /*-----------------------------------------------------------------------*/
 
+#if PF_USE_WRITE
 DRESULT disk_writep (
-	BYTE* buff,		/* Pointer to the data to be written, NULL:Initiate/Finalize write operation */
+	const BYTE* buff,		/* Pointer to the data to be written, NULL:Initiate/Finalize write operation */
 	DWORD sc		/* Sector number (LBA) or Number of bytes to send */
 )
 {
 	DRESULT res;
 
-
-	if (!buff) {
-		if (sc) {
-
-			// Initiate write process
-
-		} else {
-
-			// Finalize write process
-
-		}
-	} else {
-
-		// Send data to the disk
-
-	}
+	res = glue_disk_writep(buff, sc);
 
 	return res;
 }
-
+#endif
