@@ -61,7 +61,6 @@ private:
   MbcDevRdSERIALRX rd_serialrx_;
   MbcDevWrSERIALTX wr_serialtx_;
   MbcDevWrRXIRQFLAG wr_rxirqflag_;
-  MbcDevRdATXBUFF rd_atxbuff_;
 
   MbcDevWrUSERLED wr_userled_;
   MbcDevRdUSERKEY rd_userkey_;
