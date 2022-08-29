@@ -47,7 +47,7 @@ inline uint8_t DevSd::read(void *buf, uint8_t sz_to_read, uint8_t &__sz_read)
 
   __sz_read = static_cast<uint8_t>(sz_read);
 
-  return static_cast<uint8_t>(error & 0xFF);
+  return static_cast<uint8_t>(error);
 }
 
 inline uint8_t DevSd::write(const void *buf, uint8_t sz_to_write, uint8_t &__sz_wrote)
@@ -59,7 +59,7 @@ inline uint8_t DevSd::write(const void *buf, uint8_t sz_to_write, uint8_t &__sz_
 
   __sz_wrote = static_cast<uint8_t>(sz_wrote);
 
-  return static_cast<uint8_t>(error & 0xFF);
+  return static_cast<uint8_t>(error);
 }
 
 inline uint8_t DevSd::lseek(uint32_t sz_offset)
@@ -68,7 +68,7 @@ inline uint8_t DevSd::lseek(uint32_t sz_offset)
 
   error = PF.seek(sz_offset);
 
-  return static_cast<uint8_t>(error & 0xFF);
+  return static_cast<uint8_t>(error);
 }
 
 #endif // __INTERNAL__DEVSD_H__
