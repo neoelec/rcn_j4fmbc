@@ -6,11 +6,6 @@
 #define PIN_MCU_nRTS 11 // PD3 pin 17   * RESERVED - NOT USED *
 #define PIN_MCU_nCTS 12 // PD4 pin 18   Used only to reset uTerm at boot time
 
-void __V20MbcDevMcuVariant::begin(void)
-{
-  clock_.begin();
-}
-
 DevClock *__V20MbcDevMcuVariant::getClock(void)
 {
   return &clock_;
@@ -25,8 +20,7 @@ void V20MbcDev::begin(void)
   Serial.println(F("IOS - I/O Subsystem - S260320-R230520 + Raccoon's MOD"));
   Serial.println();
 
-  __V20MbcDevMcuVariant::begin();
-
+  clock_.begin();
   gpio_.begin();
   rtc_.begin();
   sd_.begin();

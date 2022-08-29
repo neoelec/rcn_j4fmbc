@@ -6,11 +6,6 @@
 #define PIN_MCU_nRTS 23 // PC7 pin 29   * RESERVED - NOT USED *
 #define PIN_MCU_nCTS 10 // PD2 pin 16   * RESERVED - NOT USED *
 
-void __Z80Mbc2DevMcuVariant::begin(void)
-{
-  clock_.begin();
-}
-
 DevClock *__Z80Mbc2DevMcuVariant::getClock(void)
 {
   return &clock_;
@@ -25,8 +20,7 @@ void Z80Mbc2Dev::begin(void)
   Serial.println(F("IOS - I/O Subsystem - S220718-R240620 + Raccoon's MOD"));
   Serial.println();
 
-  __Z80Mbc2DevMcuVariant::begin();
-
+  clock_.begin();
   gpio_.begin();
   rtc_.begin();
   sd_.begin();

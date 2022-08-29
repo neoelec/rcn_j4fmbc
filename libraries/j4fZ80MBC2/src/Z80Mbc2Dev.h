@@ -9,10 +9,9 @@
 class __Z80Mbc2DevMcuVariant
 {
 public:
-  void begin(void);
   DevClock *getClock(void);
 
-private:
+protected:
 #if defined(ARDUINO_AVR_ATmega32)
   DevClockATmega32 clock_;
 #elif defined(ARDUINO_AVR_ATmega1284)
