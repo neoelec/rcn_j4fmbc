@@ -10,7 +10,7 @@ class Z80Mbc2Io : public MbcIo
 {
 public:
   void begin(Z80Mbc2Dev &dev);
-  void run(void);
+  inline void run(void);
   uint8_t getSysFlag(void);
 
 private:

@@ -20,10 +20,10 @@ public:
 
 inline void MbcDevRdSERIALRX::run(MbcIo &io)
 {
-  io.setData(0xFF);
-
-  if (Serial.available() > 0)
+  if (unlikely(Serial.available() > 0))
     io.setData(Serial.read());
+  else
+    io.setData(0xFF);
 }
 
 // SERIAL TX:

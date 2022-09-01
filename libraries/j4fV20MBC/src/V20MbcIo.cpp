@@ -115,7 +115,7 @@ void V20MbcIo::__setIoDevRd(uint8_t command, MbcDev *dev)
   io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }
 
-void V20MbcIo::run(void)
+inline void V20MbcIo::run(void)
 {
   if (!pin_->getPIN_READY())
   {

@@ -118,7 +118,7 @@ void Z80Mbc2Io::__setIoDevRd(uint8_t command, MbcDev *dev)
   io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }
 
-void Z80Mbc2Io::run(void)
+inline void Z80Mbc2Io::run(void)
 {
   if (!pin_->getPIN_nWAIT())
   {
