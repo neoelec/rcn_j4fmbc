@@ -201,8 +201,8 @@ inline void V20MbcIo::__runRead(void)
   // Control bus sequence to exit from a wait state (M I/O read cycle)
   pin_->setPIN_nRDYRES_LOW();     // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
   delayMicroseconds(wait_count_); // Wait 2us just to be sure that the V20 reads the data and goes HiZ
-  pin_->releasePORT_DATA();
-  pin_->setPIN_nRDYRES_HIGH(); // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
+  pin_->releasePORT_DATA();       //
+  pin_->setPIN_nRDYRES_HIGH();    // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
 
   // Time critical section!!!
   noInterrupts();               // !!! Start of a time critical section. No interrupt allowed
@@ -224,8 +224,8 @@ inline void V20MbcIo::__runInterrupt(void)
   pin_->setPIN_nRDYRES_LOW();     // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
   delayMicroseconds(wait_count_); // Wait 2us (8 bus cycles @ 4MHz) just to be sure to execute both
   delayMicroseconds(wait_count_); //  the two INTA bus cycles
-  pin_->releasePORT_DATA();
-  pin_->setPIN_nRDYRES_HIGH(); // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
+  pin_->releasePORT_DATA();       //
+  pin_->setPIN_nRDYRES_HIGH();    // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
 
   // Time critical section!!!
   noInterrupts();               // !!! Start of a time critical section. No interrupt allowed

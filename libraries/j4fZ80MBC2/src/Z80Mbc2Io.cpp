@@ -150,11 +150,11 @@ inline void Z80Mbc2Io::__runWrite(void)
     __execWriteCommand();
 
   // Control bus sequence to exit from a wait state (M I/O write cycle)
-  pin_->setPIN_nBUSREQ_LOW();   // Request for a DMA
-  pin_->setPIN_WAIT_nRES_LOW(); // Reset WAIT FF exiting from WAIT state
-  delayMicroseconds(wait_count_);
-  pin_->setPIN_WAIT_nRES_HIGH(); // Now Z80 is in DMA, so it's safe set WAIT_RES_ HIGH again
-  pin_->setPIN_nBUSREQ_HIGH();   // Resume Z80 from DMA
+  pin_->setPIN_nBUSREQ_LOW();     // Request for a DMA
+  pin_->setPIN_WAIT_nRES_LOW();   // Reset WAIT FF exiting from WAIT state
+  delayMicroseconds(wait_count_); //
+  pin_->setPIN_WAIT_nRES_HIGH();  // Now Z80 is in DMA, so it's safe set WAIT_RES_ HIGH again
+  pin_->setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
 }
 
 inline void Z80Mbc2Io::__runRead(void)
@@ -194,11 +194,11 @@ inline void Z80Mbc2Io::__runRead(void)
 inline void Z80Mbc2Io::__runInterrupt(void)
 {
   // Control bus sequence to exit from a wait state (M interrupt cycle)
-  pin_->setPIN_nBUSREQ_LOW();   // Request for a DMA
-  pin_->setPIN_WAIT_nRES_LOW(); // Reset WAIT FF exiting from WAIT state
-  delayMicroseconds(wait_count_);
-  pin_->setPIN_WAIT_nRES_HIGH(); // Now Z80 is in DMA, so it's safe set WAIT_RES_ HIGH again
-  pin_->setPIN_nBUSREQ_HIGH();   // Resume Z80 from DMA
+  pin_->setPIN_nBUSREQ_LOW();     // Request for a DMA
+  pin_->setPIN_WAIT_nRES_LOW();   // Reset WAIT FF exiting from WAIT state
+  delayMicroseconds(wait_count_); //
+  pin_->setPIN_WAIT_nRES_HIGH();  // Now Z80 is in DMA, so it's safe set WAIT_RES_ HIGH again
+  pin_->setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
 }
 
 inline void Z80Mbc2Io::__execWriteCommand(void)
