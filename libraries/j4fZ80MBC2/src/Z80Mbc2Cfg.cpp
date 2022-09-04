@@ -11,17 +11,17 @@
 #define IDX_AUTOEXEC_EN 12
 #define IDX_CLOCK_MODE 13
 
-#define CFG_NAME_FMT "BOOTMOxx.CSV"
+#define CSV_NAME_FMT "BOOTMOxx.CSV"
 
 bool Z80Mbc2Cfg::begin(DevSd *sd)
 {
   sd_ = sd;
-  __intNrBootMode();
+  __initNrBootMode();
   __initBootMode();
   __initAutoExecEn();
   __initClkMode();
 
-  return __begin_w_boot_mode(boot_mode_);
+  return __beginBootMode(boot_mode_);
 }
 
 bool Z80Mbc2Cfg::begin(DevSd *sd, uint8_t boot_mode)
@@ -29,71 +29,71 @@ bool Z80Mbc2Cfg::begin(DevSd *sd, uint8_t boot_mode)
   bool is_ok;
 
   sd_ = sd;
-  is_ok = __begin_w_boot_mode(boot_mode);
+  is_ok = __beginBootMode(boot_mode);
   __initAutoExecEn();
   __initClkMode();
 
   return is_ok;
 }
 
-bool Z80Mbc2Cfg::begin(DevSd *sd, const char *cfg_name)
+bool Z80Mbc2Cfg::begin(DevSd *sd, const char *csv_name)
 {
   bool is_ok;
 
   sd_ = sd;
-  is_ok = __begin_w_cfg_name(cfg_name);
+  is_ok = __beginCsvName(csv_name);
   __initAutoExecEn();
   __initClkMode();
 
   return is_ok;
 }
 
-bool Z80Mbc2Cfg::__begin_w_boot_mode(uint8_t boot_mode)
+bool Z80Mbc2Cfg::__beginBootMode(uint8_t boot_mode)
 {
-  char cfg_name[] = CFG_NAME_FMT;
+  char csv_name[] = CSV_NAME_FMT;
 
-  cfg_name[6] = boot_mode / 10 + '0';
-  cfg_name[7] = boot_mode % 10 + '0';
+  csv_name[6] = boot_mode / 10 + '0';
+  csv_name[7] = boot_mode % 10 + '0';
 
-  return __begin_w_cfg_name(cfg_name);
+  return __beginCsvName(csv_name);
 }
 
-bool Z80Mbc2Cfg::__begin_w_cfg_name(const char *cfg_name)
+bool Z80Mbc2Cfg::__beginCsvName(const char *csv_name)
 {
   char csv[SZ_CSV_BUF];
-  bool is_ok = __openCsv(cfg_name);
+  bool is_ok = __openCsv(csv_name);
 
   if (!is_ok)
     return is_ok;
 
-  is_ok = __readCsv(csv, cfg_name);
+  is_ok = __readCsv(csv, csv_name);
   if (is_ok)
     __parseCsv(csv);
 
   return is_ok;
 }
 
-bool Z80Mbc2Cfg::__openCsv(const char *cfg_name)
+bool Z80Mbc2Cfg::__openCsv(const char *csv_name)
 {
   uint8_t operation;
   uint8_t error;
 
   operation = DevSd::OPEN;
-  error = sd_->open(cfg_name);
+  error = sd_->open(csv_name);
   if (error == FR_NO_FILE)
     return false;
 
   if (error == FR_OK)
     return true;
 
-  sd_->printError(error, operation, cfg_name);
+  sd_->printError(error, operation, csv_name);
   while (1)
     ;
 
   return false;
 }
 
-bool Z80Mbc2Cfg::__readCsv(char *csv, const char *cfg_name)
+bool Z80Mbc2Cfg::__readCsv(char *csv, const char *csv_name)
 {
   char buf[SZ_BUF];
   uint8_t error;
@@ -115,7 +115,7 @@ bool Z80Mbc2Cfg::__readCsv(char *csv, const char *cfg_name)
   return true;
 
 __hang_on_error:
-  sd_->printError(error, operation, cfg_name);
+  sd_->printError(error, operation, csv_name);
   while (1)
     ;
 
@@ -224,7 +224,7 @@ void Z80Mbc2Cfg::setBootMode(uint8_t boot_mode)
 {
   boot_mode_ = boot_mode;
 
-  __begin_w_boot_mode(boot_mode_);
+  __beginBootMode(boot_mode_);
 
   EEPROM.update(IDX_BOOT_MODE, boot_mode_);
 }
@@ -243,18 +243,18 @@ void Z80Mbc2Cfg::setClkMode(uint8_t clock_mode)
   EEPROM.update(IDX_CLOCK_MODE, clock_mode_);
 }
 
-void Z80Mbc2Cfg::__intNrBootMode(void)
+void Z80Mbc2Cfg::__initNrBootMode(void)
 {
-  char cfg_name[] = CFG_NAME_FMT;
+  char csv_name[] = CSV_NAME_FMT;
 
   nr_boot_mode_ = 0;
 
   for (uint8_t boot_mode = 0; boot_mode < BOOT_MODE_MAX; boot_mode++)
   {
-    cfg_name[6] = boot_mode / 10 + '0';
-    cfg_name[7] = boot_mode % 10 + '0';
+    csv_name[6] = boot_mode / 10 + '0';
+    csv_name[7] = boot_mode % 10 + '0';
 
-    if (!__openCsv(cfg_name))
+    if (!__openCsv(csv_name))
       break;
 
     nr_boot_mode_++;

@@ -10,7 +10,7 @@
 class V20MbcCfg
 {
 public:
-  bool begin(DevSd *sd, const char *cfg_name);
+  bool begin(DevSd *sd, const char *csv_name);
   bool begin(DevSd *sd, uint8_t boot_mode);
   bool begin(DevSd *sd);
   const char *getDescription(void);
@@ -34,16 +34,16 @@ public:
   void printClk(uint8_t clock_mode);
 
 private:
-  bool __openCsv(const char *cfg_name);
-  bool __readCsv(char *csv, const char *cfg_name);
+  bool __openCsv(const char *csv_name);
+  bool __readCsv(char *csv, const char *csv_name);
   void __parseCsv(char *csv);
   void __parseToken(char *toeke, uint8_t i);
   void __initBootMode(void);
   void __initAutoExecEn(void);
   void __initClkMode(void);
-  void __intNrBootMode(void);
-  bool __begin_w_boot_mode(uint8_t boot_mode);
-  bool __begin_w_cfg_name(const char *cfg_name);
+  void __initNrBootMode(void);
+  bool __beginBootMode(uint8_t boot_mode);
+  bool __beginCsvName(const char *csv_name);
 
 private:
   DevSd *sd_;
