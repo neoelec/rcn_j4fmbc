@@ -9,6 +9,10 @@
 #define likely(expr) __builtin_expect(!!(expr), 1)
 #endif
 
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+#endif
+
 #include "V20MbcCfg.h"
 #include "V20MbcPin.h"
 #include "V20MbcDev.h"

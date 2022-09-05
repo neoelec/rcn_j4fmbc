@@ -6,36 +6,45 @@
 
 #define PIN_LED_IOS 0 // PB0 pin 1    NOTE: it shares the same pin of RDYRES_
 
-void V20MbcMenu::begin(V20MbcDev &dev)
+V20MbcMenuClass V20MbcMenu;
+
+void V20MbcMenuClass::begin(V20MbcDev &dev)
 {
   rtc_ = dev.getRtc();
   sd_ = dev.getSd();
-  cfg_.begin(sd_);
-  done_ = false;
+
+  __initializeMenuCmd();
 }
 
-bool V20MbcMenu::isDone(void)
+void V20MbcMenuClass::enter(void)
+{
+  Serial.println();
+  Serial.print(F("IOS: Entering to menu ..."));
+
+  cfg_.begin(sd_);
+
+  done_ = false;
+
+  menu_cmd_.ShowMenu();
+  menu_cmd_.giveCmdPrompt();
+}
+
+void V20MbcMenuClass::run(void)
+{
+  while (!isDone())
+  {
+    uint8_t cmd = menu_cmd_.UserRequest();
+    if (cmd)
+      menu_cmd_.ExeCommand(cmd);
+  }
+}
+
+bool V20MbcMenuClass::isDone(void)
 {
   return done_;
 }
 
-SerialMenuCmd *V20MbcMenu::getMenuCmd(void)
-{
-  return &menu_cmd_;
-}
-
-void V20MbcMenu::blinkLed(void)
-{
-  static unsigned long timestamp;
-
-  if ((millis() - timestamp) > 200)
-  {
-    digitalWrite(PIN_LED_IOS, !digitalRead(PIN_LED_IOS));
-    timestamp = millis();
-  }
-}
-
-void V20MbcMenu::doChangeBootMode(void)
+void V20MbcMenuClass::doChangeBootMode(void)
 {
   String str_bm;
   long boot_mode;
@@ -69,7 +78,7 @@ __no_change:
   menu_cmd_.giveCmdPrompt();
 }
 
-void V20MbcMenu::doCmdListBootMode(void)
+void V20MbcMenuClass::doCmdListBootMode(void)
 {
   V20MbcCfg cfg_tmp;
 
@@ -85,7 +94,7 @@ void V20MbcMenu::doCmdListBootMode(void)
   menu_cmd_.giveCmdPrompt();
 }
 
-void V20MbcMenu::doCmdToggleAutoexecEn(void)
+void V20MbcMenuClass::doCmdToggleAutoexecEn(void)
 {
   Serial.println();
   cfg_.setAutoExecEn(!cfg_.getAutoExecEn());
@@ -99,7 +108,7 @@ void V20MbcMenu::doCmdToggleAutoexecEn(void)
   menu_cmd_.giveCmdPrompt();
 }
 
-void V20MbcMenu::doCmdChangeClockMode(void)
+void V20MbcMenuClass::doCmdChangeClockMode(void)
 {
   String str_idx;
   const long clock_mode_max = CLOCK_MODE_MAX;
@@ -131,7 +140,7 @@ __exit:
   menu_cmd_.giveCmdPrompt();
 }
 
-void V20MbcMenu::doCmdAdjustRtc(void)
+void V20MbcMenuClass::doCmdAdjustRtc(void)
 {
   String str_dtg;
   stDateTimeGroup dtg;
@@ -163,14 +172,7 @@ __no_change:
   menu_cmd_.giveCmdPrompt();
 }
 
-void V20MbcMenu::__adjustRtc(stDateTimeGroup &dtg)
-{
-  DateTime dt(dtg.u16Year, dtg.u8Month, dtg.u8Day, dtg.u8Hour, dtg.u8Min, dtg.u8Sec);
-
-  rtc_->adjust(dt);
-}
-
-void V20MbcMenu::doCmdPrintConfiguration(void)
+void V20MbcMenuClass::doCmdPrintConfiguration(void)
 {
   Serial.println();
   cfg_.printCfg();
@@ -178,11 +180,72 @@ void V20MbcMenu::doCmdPrintConfiguration(void)
   menu_cmd_.giveCmdPrompt();
 }
 
-void V20MbcMenu::doCmdExit(void)
+void V20MbcMenuClass::doCmdExit(void)
 {
   done_ = true;
 
   Serial.println();
   Serial.println(F("IOS: Reset ..."));
   wdt_enable(WDTO_15MS);
+}
+
+void V20MbcMenuClass::doCmdHelp(void)
+{
+  menu_cmd_.ShowMenu();
+  menu_cmd_.giveCmdPrompt();
+}
+
+void V20MbcMenuClass::__adjustRtc(stDateTimeGroup &dtg)
+{
+  DateTime dt(dtg.u16Year, dtg.u8Month, dtg.u8Day, dtg.u8Hour, dtg.u8Min, dtg.u8Sec);
+
+  rtc_->adjust(dt);
+}
+
+void V20MbcMenuClass::__blinkLed(void)
+{
+  static unsigned long timestamp;
+
+  if ((millis() - timestamp) > 200)
+  {
+    digitalWrite(PIN_LED_IOS, !digitalRead(PIN_LED_IOS));
+    timestamp = millis();
+  }
+}
+
+void V20MbcMenuClass::__initializeMenuCmd(void)
+{
+  static tMenuCmdTxt prompt[] PROGMEM = "";
+  static tMenuCmdTxt txt_p[] PROGMEM = "p - Print Configuration";
+  static tMenuCmdTxt txt_b[] PROGMEM = "b - Change Boot Mode";
+  static tMenuCmdTxt txt_l[] PROGMEM = "l - List Boot Mode";
+  static tMenuCmdTxt txt_a[] PROGMEM = "a - Toggle AUTOEXEC";
+  static tMenuCmdTxt txt_c[] PROGMEM = "c - Select CLK Mode";
+  static tMenuCmdTxt txt_t[] PROGMEM = "t - Adjust RTC";
+  static tMenuCmdTxt txt_x[] PROGMEM = "x - Exit";
+  static tMenuCmdTxt txt__[] PROGMEM = "? - Help";
+  static stMenuCmd menu_list[] = {
+      {txt_p, 'p', []()
+       { V20MbcMenu.doCmdPrintConfiguration(); }},
+      {txt_b, 'b', []()
+       { V20MbcMenu.doChangeBootMode(); }},
+      {txt_l, 'l', []()
+       { V20MbcMenu.doCmdListBootMode(); }},
+      {txt_a, 'a', []()
+       { V20MbcMenu.doCmdToggleAutoexecEn(); }},
+      {txt_c, 'c', []()
+       { V20MbcMenu.doCmdChangeClockMode(); }},
+      {txt_t, 't', []()
+       { V20MbcMenu.doCmdAdjustRtc(); }},
+      {txt_x, 'x', []()
+       { V20MbcMenu.doCmdExit(); }},
+      {txt__, '?', []()
+       { V20MbcMenu.doCmdHelp(); }}};
+
+  if (!menu_cmd_.begin(menu_list, ARRAY_SIZE(menu_list), prompt))
+  {
+    Serial.println(F("IOS: MENU Failed"));
+    while (1)
+      ;
+  }
 }

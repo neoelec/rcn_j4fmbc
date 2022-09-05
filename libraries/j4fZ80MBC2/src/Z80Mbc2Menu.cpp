@@ -6,36 +6,50 @@
 
 #define PIN_LED_IOS 0 // PB0 pin 1    Led LED_IOS is ON if HIGH
 
-void Z80Mbc2Menu::begin(Z80Mbc2Dev &dev)
+Z80Mbc2MenuClass Z80Mbc2Menu;
+
+void Z80Mbc2MenuClass::begin(Z80Mbc2Dev &dev)
 {
   rtc_ = dev.getRtc();
   sd_ = dev.getSd();
-  cfg_.begin(sd_);
-  done_ = false;
+
+  __initializeMenuCmd();
 }
 
-bool Z80Mbc2Menu::isDone(void)
+void Z80Mbc2MenuClass::enter(void)
+{
+  Serial.println();
+  Serial.print(F("IOS: Entering to menu ..."));
+
+  cfg_.begin(sd_);
+
+  done_ = false;
+
+  menu_cmd_.ShowMenu();
+  menu_cmd_.giveCmdPrompt();
+}
+
+void Z80Mbc2MenuClass::run(void)
+{
+  while (!isDone())
+  {
+    uint8_t cmd = menu_cmd_.UserRequest();
+    if (cmd)
+      menu_cmd_.ExeCommand(cmd);
+  }
+}
+
+bool Z80Mbc2MenuClass::isDone(void)
 {
   return done_;
 }
 
-SerialMenuCmd *Z80Mbc2Menu::getMenuCmd(void)
+SerialMenuCmd *Z80Mbc2MenuClass::getMenuCmd(void)
 {
   return &menu_cmd_;
 }
 
-void Z80Mbc2Menu::blinkLed(void)
-{
-  static unsigned long timestamp;
-
-  if ((millis() - timestamp) > 200)
-  {
-    digitalWrite(PIN_LED_IOS, !digitalRead(PIN_LED_IOS));
-    timestamp = millis();
-  }
-}
-
-void Z80Mbc2Menu::doChangeBootMode(void)
+void Z80Mbc2MenuClass::doCmdChangeBootMode(void)
 {
   String str_bm;
   long boot_mode;
@@ -69,7 +83,7 @@ __no_change:
   menu_cmd_.giveCmdPrompt();
 }
 
-void Z80Mbc2Menu::doCmdListBootMode(void)
+void Z80Mbc2MenuClass::doCmdListBootMode(void)
 {
   Z80Mbc2Cfg cfg_tmp;
 
@@ -85,7 +99,7 @@ void Z80Mbc2Menu::doCmdListBootMode(void)
   menu_cmd_.giveCmdPrompt();
 }
 
-void Z80Mbc2Menu::doCmdToggleAutoexecEn(void)
+void Z80Mbc2MenuClass::doCmdToggleAutoexecEn(void)
 {
   Serial.println();
   cfg_.setAutoExecEn(!cfg_.getAutoExecEn());
@@ -99,7 +113,7 @@ void Z80Mbc2Menu::doCmdToggleAutoexecEn(void)
   menu_cmd_.giveCmdPrompt();
 }
 
-void Z80Mbc2Menu::doCmdChangeClockMode(void)
+void Z80Mbc2MenuClass::doCmdChangeClockMode(void)
 {
   String str_idx;
   const long clock_mode_max = CLOCK_MODE_MAX;
@@ -131,7 +145,7 @@ __exit:
   menu_cmd_.giveCmdPrompt();
 }
 
-void Z80Mbc2Menu::doCmdAdjustRtc(void)
+void Z80Mbc2MenuClass::doCmdAdjustRtc(void)
 {
   String str_dtg;
   stDateTimeGroup dtg;
@@ -163,14 +177,7 @@ __no_change:
   menu_cmd_.giveCmdPrompt();
 }
 
-void Z80Mbc2Menu::__adjustRtc(stDateTimeGroup &dtg)
-{
-  DateTime dt(dtg.u16Year, dtg.u8Month, dtg.u8Day, dtg.u8Hour, dtg.u8Min, dtg.u8Sec);
-
-  rtc_->adjust(dt);
-}
-
-void Z80Mbc2Menu::doCmdPrintConfiguration(void)
+void Z80Mbc2MenuClass::doCmdPrintConfiguration(void)
 {
   Serial.println();
   cfg_.printCfg();
@@ -178,11 +185,72 @@ void Z80Mbc2Menu::doCmdPrintConfiguration(void)
   menu_cmd_.giveCmdPrompt();
 }
 
-void Z80Mbc2Menu::doCmdExit(void)
+void Z80Mbc2MenuClass::doCmdExit(void)
 {
   done_ = true;
 
   Serial.println();
   Serial.println(F("IOS: Reset ..."));
   wdt_enable(WDTO_15MS);
+}
+
+void Z80Mbc2MenuClass::doCmdHelp(void)
+{
+  menu_cmd_.ShowMenu();
+  menu_cmd_.giveCmdPrompt();
+}
+
+void Z80Mbc2MenuClass::__adjustRtc(stDateTimeGroup &dtg)
+{
+  DateTime dt(dtg.u16Year, dtg.u8Month, dtg.u8Day, dtg.u8Hour, dtg.u8Min, dtg.u8Sec);
+
+  rtc_->adjust(dt);
+}
+
+void Z80Mbc2MenuClass::__blinkLed(void)
+{
+  static unsigned long timestamp;
+
+  if ((millis() - timestamp) > 200)
+  {
+    digitalWrite(PIN_LED_IOS, !digitalRead(PIN_LED_IOS));
+    timestamp = millis();
+  }
+}
+
+void Z80Mbc2MenuClass::__initializeMenuCmd(void)
+{
+  static tMenuCmdTxt prompt[] PROGMEM = "";
+  static tMenuCmdTxt txt_p[] PROGMEM = "p - Print Configuration";
+  static tMenuCmdTxt txt_b[] PROGMEM = "b - Change Boot Mode";
+  static tMenuCmdTxt txt_l[] PROGMEM = "l - List Boot Mode";
+  static tMenuCmdTxt txt_a[] PROGMEM = "a - Toggle AUTOEXEC";
+  static tMenuCmdTxt txt_c[] PROGMEM = "c - Select CLK Mode";
+  static tMenuCmdTxt txt_t[] PROGMEM = "t - Adjust RTC";
+  static tMenuCmdTxt txt_x[] PROGMEM = "x - Exit";
+  static tMenuCmdTxt txt__[] PROGMEM = "? - Help";
+  static stMenuCmd menu_list[] = {
+      {txt_p, 'p', []()
+       { Z80Mbc2Menu.doCmdPrintConfiguration(); }},
+      {txt_b, 'b', []()
+       { Z80Mbc2Menu.doCmdChangeBootMode(); }},
+      {txt_l, 'l', []()
+       { Z80Mbc2Menu.doCmdListBootMode(); }},
+      {txt_a, 'a', []()
+       { Z80Mbc2Menu.doCmdToggleAutoexecEn(); }},
+      {txt_c, 'c', []()
+       { Z80Mbc2Menu.doCmdChangeClockMode(); }},
+      {txt_t, 't', []()
+       { Z80Mbc2Menu.doCmdAdjustRtc(); }},
+      {txt_x, 'x', []()
+       { Z80Mbc2Menu.doCmdExit(); }},
+      {txt__, '?', []()
+       { Z80Mbc2Menu.doCmdHelp(); }}};
+
+  if (!menu_cmd_.begin(menu_list, ARRAY_SIZE(menu_list), prompt))
+  {
+    Serial.println(F("IOS: MENU Failed"));
+    while (1)
+      ;
+  }
 }
