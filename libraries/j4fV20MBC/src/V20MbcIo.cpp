@@ -121,7 +121,7 @@ void V20MbcIoClass::__setIoDevRd(uint8_t command, MbcDev *dev)
   io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }
 
-inline void V20MbcIoClass::operateIo(void)
+inline void V20MbcIoClass::runIo(void)
 {
   if (!pin_->getPIN_READY())
   {
@@ -321,5 +321,5 @@ void __V20MbcIoStateBootstrap::handle(V20MbcIoClass *io)
 
 void __V20MbcIoStateRun::handle(V20MbcIoClass *io)
 {
-  io->operateIo();
+  io->runIo();
 }

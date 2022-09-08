@@ -52,7 +52,7 @@ public:
   void begin(void);
   inline void run(void);
   inline void serialEvent(void);
-  inline void operateIo(void);
+  inline void runIo(void);
   uint8_t getSysFlag(void);
 
 private:

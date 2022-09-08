@@ -128,7 +128,7 @@ void Z80Mbc2IoClass::__setIoDevRd(uint8_t command, MbcDev *dev)
   io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }
 
-inline void Z80Mbc2IoClass::operateIo(void)
+inline void Z80Mbc2IoClass::runIo(void)
 {
   if (!pin_->getPIN_nWAIT())
   {
@@ -279,5 +279,5 @@ void __Z80Mbc2IoStateBootstrap::handle(Z80Mbc2IoClass *io)
 
 void __Z80Mbc2IoStateRun::handle(Z80Mbc2IoClass *io)
 {
-  io->operateIo();
+  io->runIo();
 }
