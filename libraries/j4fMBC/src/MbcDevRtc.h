@@ -34,12 +34,12 @@ protected:
 class MbcDevRdDATETIME : public MbcDev, public MbcDevRtc
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdDATETIME::run(MbcIo &io)
+inline void MbcDevRdDATETIME::run(MbcIo *io)
 {
-  const uint16_t io_count = io.getCount();
+  const uint16_t io_count = io->getCount();
   uint8_t io_data;
 
   switch (io_count)
@@ -67,12 +67,12 @@ inline void MbcDevRdDATETIME::run(MbcIo &io)
     io_data = rtc_->getTemperature();
     break;
   default:
-    io.setCommand(MbcIo::NO_OPERATION);
+    io->setCommand(MbcIo::NO_OPERATION);
     return;
   }
 
-  io.setData(io_data);
-  io.setCount(io_count + 1);
+  io->setData(io_data);
+  io->setCount(io_count + 1);
 }
 
 #endif // __INTERNAL__MBCDEVRTC_H__

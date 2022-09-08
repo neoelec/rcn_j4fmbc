@@ -27,13 +27,13 @@ public:
 
   void begin(DevSd *sd);
   inline void setDiskSetIdx(uint8_t disk_set);
-  inline void ioWrSELDISK(MbcIo &io);
-  inline void ioWrSELTRACK(MbcIo &io);
-  inline void ioWrSELSECT(MbcIo &io);
-  inline void ioWrWRITESECT(MbcIo &io);
-  inline void ioRdERRDISK(MbcIo &io);
-  inline void ioRdREADSECT(MbcIo &io);
-  inline void ioRdSDMOUNT(MbcIo &io);
+  inline void ioWrSELDISK(MbcIo *io);
+  inline void ioWrSELTRACK(MbcIo *io);
+  inline void ioWrSELSECT(MbcIo *io);
+  inline void ioWrWRITESECT(MbcIo *io);
+  inline void ioRdERRDISK(MbcIo *io);
+  inline void ioRdREADSECT(MbcIo *io);
+  inline void ioRdSDMOUNT(MbcIo *io);
 
 private:
   inline uint32_t __trackToSector(uint32_t track_number);
@@ -55,9 +55,9 @@ inline void MbcDisk::setDiskSetIdx(uint8_t disk_set_idx)
   disk_set_idx_ = disk_set_idx;
 }
 
-inline void MbcDisk::ioWrSELDISK(MbcIo &io)
+inline void MbcDisk::ioWrSELDISK(MbcIo *io)
 {
-  const uint8_t disk_number = io.getData();
+  const uint8_t disk_number = io->getData();
 
   if (likely(disk_number <= MAX_DISK_PER_SET))
   {
@@ -70,10 +70,10 @@ inline void MbcDisk::ioWrSELDISK(MbcIo &io)
     disk_error_ = ILL_DISK_NUM;
 }
 
-inline void MbcDisk::ioWrSELTRACK(MbcIo &io)
+inline void MbcDisk::ioWrSELTRACK(MbcIo *io)
 {
-  const uint16_t io_count = io.getCount();
-  const uint8_t io_data = io.getData();
+  const uint16_t io_count = io->getCount();
+  const uint8_t io_data = io->getData();
 
   if (unlikely(!io_count))
     track_selected_ = io_data;
@@ -91,15 +91,15 @@ inline void MbcDisk::ioWrSELTRACK(MbcIo &io)
         disk_error_ = ILL_SECT_NUM;
     }
 
-    io.setCommand(MbcIo::NO_OPERATION);
+    io->setCommand(MbcIo::NO_OPERATION);
   }
 
-  io.setCount(io_count + 1);
+  io->setCount(io_count + 1);
 }
 
-inline void MbcDisk::ioWrSELSECT(MbcIo &io)
+inline void MbcDisk::ioWrSELSECT(MbcIo *io)
 {
-  sector_selected_ = io.getData();
+  sector_selected_ = io->getData();
 
   if (likely(__isValidTrackAndSector()))
     disk_error_ = FR_OK;
@@ -112,9 +112,9 @@ inline void MbcDisk::ioWrSELSECT(MbcIo &io)
   }
 }
 
-inline void MbcDisk::ioWrWRITESECT(MbcIo &io)
+inline void MbcDisk::ioWrWRITESECT(MbcIo *io)
 {
-  const uint16_t io_count = io.getCount();
+  const uint16_t io_count = io->getCount();
 
   if (unlikely(!io_count))
   {
@@ -131,7 +131,7 @@ inline void MbcDisk::ioWrWRITESECT(MbcIo &io)
   {
     uint16_t index = io_count % SZ_BUFFER;
 
-    buffer_[index] = io.getData();
+    buffer_[index] = io->getData();
 
     if (unlikely(index == (SZ_BUFFER - 1)))
     {
@@ -146,22 +146,22 @@ inline void MbcDisk::ioWrWRITESECT(MbcIo &io)
         if (likely(disk_error_ == FR_OK))
           disk_error_ = sd_->write(NULL, 0, sz_wrote);
 
-        io.setCommand(MbcIo::NO_OPERATION);
+        io->setCommand(MbcIo::NO_OPERATION);
       }
     }
   }
 
-  io.setCount(io_count + 1);
+  io->setCount(io_count + 1);
 }
 
-inline void MbcDisk::ioRdERRDISK(MbcIo &io)
+inline void MbcDisk::ioRdERRDISK(MbcIo *io)
 {
-  io.setData(disk_error_);
+  io->setData(disk_error_);
 }
 
-inline void MbcDisk::ioRdREADSECT(MbcIo &io)
+inline void MbcDisk::ioRdREADSECT(MbcIo *io)
 {
-  const uint16_t io_count = io.getCount();
+  const uint16_t io_count = io->getCount();
 
   if (unlikely(!io_count))
   {
@@ -188,18 +188,18 @@ inline void MbcDisk::ioRdREADSECT(MbcIo &io)
     }
 
     if (likely(disk_error_ == FR_OK))
-      io.setData(buffer_[index]);
+      io->setData(buffer_[index]);
   }
 
   if (unlikely(io_count >= (MAX_TRACK - 1)))
-    io.setCommand(MbcIo::NO_OPERATION);
+    io->setCommand(MbcIo::NO_OPERATION);
 
-  io.setCount(io_count + 1);
+  io->setCount(io_count + 1);
 }
 
-inline void MbcDisk::ioRdSDMOUNT(MbcIo &io)
+inline void MbcDisk::ioRdSDMOUNT(MbcIo *io)
 {
-  io.setData(sd_->mount());
+  io->setData(sd_->mount());
 }
 
 inline uint32_t MbcDisk::__trackToSector(uint32_t track_number)

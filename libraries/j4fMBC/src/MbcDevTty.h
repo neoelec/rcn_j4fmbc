@@ -15,15 +15,15 @@
 class MbcDevRdSERIALRX : public MbcDev
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdSERIALRX::run(MbcIo &io)
+inline void MbcDevRdSERIALRX::run(MbcIo *io)
 {
   if (unlikely(Serial.available() > 0))
-    io.setData(Serial.read());
+    io->setData(Serial.read());
   else
-    io.setData(0xFF);
+    io->setData(0xFF);
 }
 
 // SERIAL TX:
@@ -33,12 +33,12 @@ inline void MbcDevRdSERIALRX::run(MbcIo &io)
 class MbcDevWrSERIALTX : public MbcDev
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrSERIALTX::run(MbcIo &io)
+inline void MbcDevWrSERIALTX::run(MbcIo *io)
 {
-  Serial.write(io.getData());
+  Serial.write(io->getData());
 }
 
 // RX IRQ FLAG:
@@ -53,13 +53,13 @@ inline void MbcDevWrSERIALTX::run(MbcIo &io)
 class MbcDevWrRXIRQFLAG : public MbcDev
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrRXIRQFLAG::run(MbcIo &io)
+inline void MbcDevWrRXIRQFLAG::run(MbcIo *io)
 {
-  if (io.getData() & (0x1 << MbcIo::IRQ_RX))
-    io.setIrq(MbcIo::IRQ_RX);
+  if (io->getData() & (0x1 << MbcIo::IRQ_RX))
+    io->setIrq(MbcIo::IRQ_RX);
 }
 
 // ATXBUFF - return the current available free space (in bytes) in the TX buffer:
@@ -73,12 +73,12 @@ inline void MbcDevWrRXIRQFLAG::run(MbcIo &io)
 class MbcDevRdATXBUFF : public MbcDev
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdATXBUFF::run(MbcIo &io)
+inline void MbcDevRdATXBUFF::run(MbcIo *io)
 {
-  io.setData(Serial.availableForWrite());
+  io->setData(Serial.availableForWrite());
 }
 
 #endif // __INTERNAL__MBCDEVTTY_H__

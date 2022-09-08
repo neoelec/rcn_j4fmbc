@@ -67,12 +67,12 @@ protected:
 class Z80Mbc2DevWrSETBANK : public Z80Mbc2DevBank
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void Z80Mbc2DevWrSETBANK::run(MbcIo &io)
+inline void Z80Mbc2DevWrSETBANK::run(MbcIo *io)
 {
-  switch (io.getData())
+  switch (io->getData())
   {
   case 0:
     pin_->setPIN_BANK0_HIGH();

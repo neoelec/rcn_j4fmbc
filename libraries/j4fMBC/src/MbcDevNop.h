@@ -6,10 +6,10 @@
 class MbcDevRdWrNOP : public MbcDev
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdWrNOP::run(MbcIo &io)
+inline void MbcDevRdWrNOP::run(MbcIo *io)
 {
 }
 

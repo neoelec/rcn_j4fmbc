@@ -25,12 +25,12 @@ protected:
 class MbcDevWrGPIOA : public MbcDev, public MbcDevGpio
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrGPIOA::run(MbcIo &io)
+inline void MbcDevWrGPIOA::run(MbcIo *io)
 {
-  gpio_->writeGPIOA(io.getData());
+  gpio_->writeGPIOA(io->getData());
 }
 
 // GPIOB Write (GPE Option):
@@ -41,12 +41,12 @@ inline void MbcDevWrGPIOA::run(MbcIo &io)
 class MbcDevWrGPIOB : public MbcDev, public MbcDevGpio
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrGPIOB::run(MbcIo &io)
+inline void MbcDevWrGPIOB::run(MbcIo *io)
 {
-  gpio_->writeGPIOB(io.getData());
+  gpio_->writeGPIOB(io->getData());
 }
 
 // IODIRA Write (GPE Option):
@@ -57,12 +57,12 @@ inline void MbcDevWrGPIOB::run(MbcIo &io)
 class MbcDevWrIODIRA : public MbcDev, public MbcDevGpio
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrIODIRA::run(MbcIo &io)
+inline void MbcDevWrIODIRA::run(MbcIo *io)
 {
-  gpio_->writeIODIRA(io.getData());
+  gpio_->writeIODIRA(io->getData());
 }
 
 // IODIRB Write (GPE Option):
@@ -73,12 +73,12 @@ inline void MbcDevWrIODIRA::run(MbcIo &io)
 class MbcDevWrIODIRB : public MbcDev, public MbcDevGpio
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrIODIRB::run(MbcIo &io)
+inline void MbcDevWrIODIRB::run(MbcIo *io)
 {
-  gpio_->writeIODIRB(io.getData());
+  gpio_->writeIODIRB(io->getData());
 }
 
 // GPPUA Write (GPE Option):
@@ -89,12 +89,12 @@ inline void MbcDevWrIODIRB::run(MbcIo &io)
 class MbcDevWrGPPUA : public MbcDev, public MbcDevGpio
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrGPPUA::run(MbcIo &io)
+inline void MbcDevWrGPPUA::run(MbcIo *io)
 {
-  gpio_->writeGPPUA(io.getData());
+  gpio_->writeGPPUA(io->getData());
 }
 
 // GPPUB Write (GPIO Exp. Mod. ):
@@ -105,12 +105,12 @@ inline void MbcDevWrGPPUA::run(MbcIo &io)
 class MbcDevWrGPPUB : public MbcDev, public MbcDevGpio
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrGPPUB::run(MbcIo &io)
+inline void MbcDevWrGPPUB::run(MbcIo *io)
 {
-  gpio_->writeGPPUB(io.getData());
+  gpio_->writeGPPUB(io->getData());
 }
 
 // GPIOA Read (GPE Option):
@@ -123,12 +123,12 @@ inline void MbcDevWrGPPUB::run(MbcIo &io)
 class MbcDevRdGPIOA : public MbcDev, public MbcDevGpio
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdGPIOA::run(MbcIo &io)
+inline void MbcDevRdGPIOA::run(MbcIo *io)
 {
-  io.setData(gpio_->readGPIOA());
+  io->setData(gpio_->readGPIOA());
 }
 
 // GPIOB Read (GPE Option):
@@ -141,12 +141,12 @@ inline void MbcDevRdGPIOA::run(MbcIo &io)
 class MbcDevRdGPIOB : public MbcDev, public MbcDevGpio
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdGPIOB::run(MbcIo &io)
+inline void MbcDevRdGPIOB::run(MbcIo *io)
 {
-  io.setData(gpio_->readGPIOB());
+  io->setData(gpio_->readGPIOB());
 }
 
 #endif /* __INTERNAL__MBCDEVGPIO_H__ */

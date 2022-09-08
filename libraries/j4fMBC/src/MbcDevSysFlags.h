@@ -13,7 +13,7 @@ public:
     PREV_RX,
   };
 
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
 // SYSFLAGS (Various system flags for the OS):
@@ -29,13 +29,13 @@ public:
 //                              X  X  X  X  1  X  X  X    Previous RX char was a "buffer empty" flag
 //
 // NOTE: Currently only D0-D3 are used
-inline void MbcDevRdSYSFLAGS::run(MbcIo &io)
+inline void MbcDevRdSYSFLAGS::run(MbcIo *io)
 {
-  uint8_t io_data = io.getSysFlag();
+  uint8_t io_data = io->getSysFlag();
 
   io_data |= (!!Serial.available()) << TTY_RX_BUF;
 
-  io.setData(io_data);
+  io->setData(io_data);
 }
 
 #endif // __MBCDEVSYSFLAGS_H__

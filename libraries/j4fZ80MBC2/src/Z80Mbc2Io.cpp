@@ -217,7 +217,7 @@ inline void Z80Mbc2IoClass::__execWriteCommand(void)
 
   if (likely(command >= MbcIo::WR_BEGIN && command <= MbcIo::WR_END))
   {
-    io_dev_wr_[command - MbcIo::WR_BEGIN]->run(*this);
+    io_dev_wr_[command - MbcIo::WR_BEGIN]->run(this);
 
     if (command != MbcIo::WR_SELSECT && command != MbcIo::WR_WRITESECT)
       setCommand(MbcIo::NO_OPERATION);
@@ -230,7 +230,7 @@ inline void Z80Mbc2IoClass::__execReadCommand(void)
 
   if (likely(command >= MbcIo::RD_BEGIN && command <= MbcIo::RD_END))
   {
-    io_dev_rd_[command - MbcIo::RD_BEGIN]->run(*this);
+    io_dev_rd_[command - MbcIo::RD_BEGIN]->run(this);
 
     if (command != MbcIo::RD_DATETIME && command != MbcIo::RD_READSECT)
       setCommand(MbcIo::NO_OPERATION);

@@ -189,12 +189,12 @@ inline void V20MbcIoClass::__runRead(void)
     break;
 
   case 1: // AD1-AD0 = 1 (I/O read address = 0x01): SERIAL RX.
-    rd_serialrx_.run(*this);
+    rd_serialrx_.run(this);
     pin_->setPIN_INTR_LOW(); // INTR = LOW: Reset the INTR signal (if used).
     break;
 
   case 2: // AD1-AD0 = 2 (I/O read address = 0x02): SYSFLAGS.
-    rd_sysflags_.run(*this);
+    rd_sysflags_.run(this);
     break;
 
   case 3: // NOT USED - RESERVED
@@ -259,7 +259,7 @@ inline void V20MbcIoClass::__execWriteOpcode(void)
 
   if (likely(command >= MbcIo::WR_BEGIN && command <= MbcIo::WR_END))
   {
-    io_dev_wr_[command - MbcIo::WR_BEGIN]->run(*this);
+    io_dev_wr_[command - MbcIo::WR_BEGIN]->run(this);
 
     if (command != MbcIo::WR_SELSECT && command != MbcIo::WR_WRITESECT)
       setCommand(MbcIo::NO_OPERATION);
@@ -272,7 +272,7 @@ inline void V20MbcIoClass::__execReadOpcode(void)
 
   if (likely(command >= MbcIo::RD_BEGIN && command <= MbcIo::RD_END))
   {
-    io_dev_rd_[command - MbcIo::RD_BEGIN]->run(*this);
+    io_dev_rd_[command - MbcIo::RD_BEGIN]->run(this);
 
     if (command != MbcIo::RD_DATETIME && command != MbcIo::RD_READSECT)
       setCommand(MbcIo::NO_OPERATION);

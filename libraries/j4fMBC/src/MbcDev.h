@@ -6,7 +6,7 @@ class MbcIo;
 class MbcDev
 {
 public:
-  virtual void run(MbcIo &io) = 0;
+  virtual void run(MbcIo *io) = 0;
 };
 
 #endif // __INTERNAL__MBCDEV_H__

@@ -50,10 +50,10 @@ protected:
 class MbcDevWrSELDISK : public MbcDev, public MbcDevDisk
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrSELDISK::run(MbcIo &io)
+inline void MbcDevWrSELDISK::run(MbcIo *io)
 {
   disk_->ioWrSELDISK(io);
 }
@@ -84,10 +84,10 @@ inline void MbcDevWrSELDISK::run(MbcIo &io)
 class MbcDevWrSELTRACK : public MbcDev, public MbcDevDisk
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrSELTRACK::run(MbcIo &io)
+inline void MbcDevWrSELTRACK::run(MbcIo *io)
 {
   disk_->ioWrSELTRACK(io);
 }
@@ -114,10 +114,10 @@ inline void MbcDevWrSELTRACK::run(MbcIo &io)
 class MbcDevWrSELSECT : public MbcDev, public MbcDevDisk
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrSELSECT::run(MbcIo &io)
+inline void MbcDevWrSELSECT::run(MbcIo *io)
 {
   disk_->ioWrSELSECT(io);
 }
@@ -154,10 +154,10 @@ inline void MbcDevWrSELSECT::run(MbcIo &io)
 class MbcDevWrWRITESECT : public MbcDev, public MbcDevDisk
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrWRITESECT::run(MbcIo &io)
+inline void MbcDevWrWRITESECT::run(MbcIo *io)
 {
   disk_->ioWrWRITESECT(io);
 }
@@ -200,10 +200,10 @@ inline void MbcDevWrWRITESECT::run(MbcIo &io)
 class MbcDevRdERRDISK : public MbcDev, public MbcDevDisk
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdERRDISK::run(MbcIo &io)
+inline void MbcDevRdERRDISK::run(MbcIo *io)
 {
   disk_->ioRdERRDISK(io);
 }
@@ -237,10 +237,10 @@ inline void MbcDevRdERRDISK::run(MbcIo &io)
 class MbcDevRdREADSECT : public MbcDev, public MbcDevDisk
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdREADSECT::run(MbcIo &io)
+inline void MbcDevRdREADSECT::run(MbcIo *io)
 {
   disk_->ioRdREADSECT(io);
 }
@@ -262,10 +262,10 @@ inline void MbcDevRdREADSECT::run(MbcIo &io)
 class MbcDevRdSDMOUNT : public MbcDev, public MbcDevDisk
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdSDMOUNT::run(MbcIo &io)
+inline void MbcDevRdSDMOUNT::run(MbcIo *io)
 {
   disk_->ioRdSDMOUNT(io);
 }

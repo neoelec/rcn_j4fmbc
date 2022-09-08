@@ -25,12 +25,12 @@ protected:
 class MbcDevWrUSERLED : public MbcDev, public MbcDevUser
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrUSERLED::run(MbcIo &io)
+inline void MbcDevWrUSERLED::run(MbcIo *io)
 {
-  const uint8_t io_data = io.getData();
+  const uint8_t io_data = io->getData();
 
   if (io_data & 0x01)
     user_->setLedOn();
@@ -46,12 +46,12 @@ inline void MbcDevWrUSERLED::run(MbcIo &io)
 class MbcDevRdUSERKEY : public MbcDev, public MbcDevUser
 {
 public:
-  inline void run(MbcIo &io);
+  inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdUSERKEY::run(MbcIo &io)
+inline void MbcDevRdUSERKEY::run(MbcIo *io)
 {
-  io.setData(user_->getKey());
+  io->setData(user_->getKey());
 }
 
 #endif // __INTERNAL__MBCDEVUSER_H__
