@@ -60,7 +60,9 @@ public:
   inline void setCount(uint16_t count);
   inline void clearIrq(uint8_t number);
   inline void setIrq(uint8_t number);
+  virtual void begin(void) = 0;
   virtual void run(void) = 0;
+  virtual void serialEvent(void) = 0;
   virtual uint8_t getSysFlag(void) = 0;
 
 protected:
