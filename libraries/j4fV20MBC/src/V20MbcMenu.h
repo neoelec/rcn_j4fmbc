@@ -4,14 +4,14 @@
 #include <j4fDev.h>
 #include <SerialMenuCmd.h>
 
-#include "j4fV20Mbc.h"
+#include "V20MbcCfg.h"
 
 class V20MbcMenuClass
 {
 public:
   void begin(V20MbcDev &dev);
   void enter(void);
-  void run(void);
+  bool run(void);
   SerialMenuCmd *getMenuCmd(void);
   bool isDone(void);
   void doChangeBootMode(void);

@@ -4,24 +4,30 @@
 
 #include "j4fV20Mbc.h"
 
-void V20MbcIo::begin(V20MbcDev &dev)
+V20MbcIoClass V20MbcIo;
+
+void V20MbcIoClass::begin(void)
 {
   staticSysFlags_ = 0;
 
-  __beginIoDev(dev);
-  __initFromCfg(dev);
-  __initIoDevWr(dev);
-  __initIoDevRd(dev);
+  dev_.begin();
+
+  __beginIoDev();
+  __initFromCfg();
+  __initIoDevWr();
+  __initIoDevRd();
+
+  state_ = &st_init_;
 }
 
-void V20MbcIo::__beginIoDev(V20MbcDev &dev)
+void V20MbcIoClass::__beginIoDev(void)
 {
-  auto *gpio = dev.getGpio();
-  auto *user = dev.getUser();
-  auto *disk = dev.getDisk();
-  auto *rtc = dev.getRtc();
+  auto *gpio = dev_.getGpio();
+  auto *user = dev_.getUser();
+  auto *disk = dev_.getDisk();
+  auto *rtc = dev_.getRtc();
 
-  pin_ = dev.getPin();
+  pin_ = dev_.getPin();
 
   wr_seldisk_.begin(disk);
   wr_seltrack_.begin(disk);
@@ -48,19 +54,19 @@ void V20MbcIo::__beginIoDev(V20MbcDev &dev)
   staticSysFlags_ |= rtc->isAvailable() << MbcDevRdSYSFLAGS::RTC;
 }
 
-void V20MbcIo::__initFromCfg(V20MbcDev &dev)
+void V20MbcIoClass::__initFromCfg(void)
 {
   V20MbcCfg cfg;
 
-  cfg.begin(dev.getSd());
+  cfg.begin(dev_.getSd());
 
   staticSysFlags_ |= cfg.getAutoExecEn() << MbcDevRdSYSFLAGS::AUTOEXEC;
   wait_count_ = 1 << cfg.getClkMode();
 }
 
-void V20MbcIo::__initIoDevWr(V20MbcDev &dev)
+void V20MbcIoClass::__initIoDevWr(void)
 {
-  auto *gpio = dev.getGpio();
+  auto *gpio = dev_.getGpio();
 
   for (uint8_t command = MbcIo::WR_BEGIN; command <= MbcIo::WR_END; command++)
     __setIoDevWr(command, &rdwr_nop_);
@@ -84,14 +90,14 @@ void V20MbcIo::__initIoDevWr(V20MbcDev &dev)
   }
 }
 
-void V20MbcIo::__setIoDevWr(uint8_t command, MbcDev *dev)
+void V20MbcIoClass::__setIoDevWr(uint8_t command, MbcDev *dev)
 {
   io_dev_wr_[command - MbcIo::WR_BEGIN] = dev;
 }
 
-void V20MbcIo::__initIoDevRd(V20MbcDev &dev)
+void V20MbcIoClass::__initIoDevRd(void)
 {
-  auto *gpio = dev.getGpio();
+  auto *gpio = dev_.getGpio();
 
   for (uint8_t command = MbcIo::RD_BEGIN; command <= MbcIo::RD_END; command++)
     __setIoDevRd(command, &rdwr_nop_);
@@ -110,12 +116,12 @@ void V20MbcIo::__initIoDevRd(V20MbcDev &dev)
   }
 }
 
-void V20MbcIo::__setIoDevRd(uint8_t command, MbcDev *dev)
+void V20MbcIoClass::__setIoDevRd(uint8_t command, MbcDev *dev)
 {
   io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }
 
-inline void V20MbcIo::run(void)
+inline void V20MbcIoClass::operateIo(void)
 {
   if (!pin_->getPIN_READY())
   {
@@ -133,12 +139,12 @@ inline void V20MbcIo::run(void)
     pin_->setPIN_INTR_HIGH();
 }
 
-uint8_t V20MbcIo::getSysFlag(void)
+uint8_t V20MbcIoClass::getSysFlag(void)
 {
   return staticSysFlags_;
 }
 
-inline void V20MbcIo::__runWrite(void)
+inline void V20MbcIoClass::__runWrite(void)
 {
   _setAddress(pin_->getPIN_AD1AD0());
   setData(pin_->getPORT_DATA());
@@ -171,7 +177,7 @@ inline void V20MbcIo::__runWrite(void)
   interrupts();                 // !!! End of a time critical section. Interrupt resumed
 }
 
-inline void V20MbcIo::__runRead(void)
+inline void V20MbcIoClass::__runRead(void)
 {
   _setAddress(pin_->getPIN_AD1AD0());
   setData(0);
@@ -211,7 +217,7 @@ inline void V20MbcIo::__runRead(void)
   interrupts();                 // !!! End of a time critical section. Interrupt resumed
 }
 
-inline void V20MbcIo::__runInterrupt(void)
+inline void V20MbcIoClass::__runInterrupt(void)
 {
   // Now CPU is in the first of the two INTA_ bus cycles
   pin_->setPIN_INTR_LOW(); // INTR = LOW: Reset the INTR signal
@@ -234,7 +240,7 @@ inline void V20MbcIo::__runInterrupt(void)
   interrupts();                 // !!! End of a time critical section. Interrupt resumed
 }
 
-inline void V20MbcIo::__runHalt(void)
+inline void V20MbcIoClass::__runHalt(void)
 {
   static bool halted;
 
@@ -247,7 +253,7 @@ inline void V20MbcIo::__runHalt(void)
   }
 }
 
-inline void V20MbcIo::__execWriteOpcode(void)
+inline void V20MbcIoClass::__execWriteOpcode(void)
 {
   uint8_t command = getCommand();
 
@@ -260,7 +266,7 @@ inline void V20MbcIo::__execWriteOpcode(void)
   }
 }
 
-inline void V20MbcIo::__execReadOpcode(void)
+inline void V20MbcIoClass::__execReadOpcode(void)
 {
   uint8_t command = getCommand();
 
@@ -271,4 +277,49 @@ inline void V20MbcIo::__execReadOpcode(void)
     if (command != MbcIo::RD_DATETIME && command != MbcIo::RD_READSECT)
       setCommand(MbcIo::NO_OPERATION);
   }
+}
+
+// states
+
+void __V20MbcIoStateInit::handle(V20MbcIoClass *io)
+{
+  V20MbcDev &dev = io->dev_;
+  DevUser *user = dev.getUser();
+
+  if (!user->getKey())
+    io->state_ = &io->st_bootstrap_;
+  else
+    io->state_ = &io->st_menu_enter_;
+}
+
+void __V20MbcIoStateMenuEnter::handle(V20MbcIoClass *io)
+{
+  V20MbcDev &dev = io->dev_;
+
+  V20MbcMenu.begin(dev);
+  V20MbcMenu.enter();
+
+  io->state_ = &io->st_menu_run_;
+}
+
+void __V20MbcIoStateMenuRun::handle(V20MbcIoClass *io)
+{
+  if (!V20MbcMenu.run())
+    io->state_ = &io->st_bootstrap_;
+}
+
+void __V20MbcIoStateBootstrap::handle(V20MbcIoClass *io)
+{
+  V20MbcDev &dev = io->dev_;
+  V20MbcLoader &loader = io->loader_;
+
+  loader.begin(dev);
+  loader.bootstrap();
+
+  io->state_ = &io->st_run_;
+}
+
+void __V20MbcIoStateRun::handle(V20MbcIoClass *io)
+{
+  io->operateIo();
 }
