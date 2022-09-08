@@ -69,11 +69,10 @@ private:
   inline void __execWriteCommand(void);
   inline void __execReadCommand(void);
 
-public:
+private:
   Z80Mbc2Dev dev_;
   Z80Mbc2Loader loader_;
 
-private:
   Z80Mbc2Pin *pin_;
   uint8_t staticSysFlags_;
   uint8_t wait_count_;

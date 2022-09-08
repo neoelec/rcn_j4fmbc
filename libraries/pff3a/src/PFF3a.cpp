@@ -1,5 +1,3 @@
-#pragma GCC optimize("O2")
-
 #include <Arduino.h>
 
 #include "diskIoArduino.h"
