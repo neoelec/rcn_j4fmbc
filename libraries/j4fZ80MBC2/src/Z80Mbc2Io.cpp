@@ -4,25 +4,31 @@
 
 #include "j4fZ80Mbc2.h"
 
-void Z80Mbc2Io::begin(Z80Mbc2Dev &dev)
+Z80Mbc2IoClass Z80Mbc2Io;
+
+void Z80Mbc2IoClass::begin(void)
 {
   staticSysFlags_ = 0;
   last_rx_is_empty_ = 0;
 
-  __beginIoDev(dev);
-  __initFromCfg(dev);
-  __initIoDevWr(dev);
-  __initIoDevRd(dev);
+  dev_.begin();
+
+  __beginIoDev();
+  __initFromCfg();
+  __initIoDevWr();
+  __initIoDevRd();
+
+  state_ = &st_init_;
 }
 
-void Z80Mbc2Io::__beginIoDev(Z80Mbc2Dev &dev)
+void Z80Mbc2IoClass::__beginIoDev(void)
 {
-  auto *gpio = dev.getGpio();
-  auto *user = dev.getUser();
-  auto *disk = dev.getDisk();
-  auto *rtc = dev.getRtc();
+  auto *gpio = dev_.getGpio();
+  auto *user = dev_.getUser();
+  auto *disk = dev_.getDisk();
+  auto *rtc = dev_.getRtc();
 
-  pin_ = dev.getPin();
+  pin_ = dev_.getPin();
 
   wr_seldisk_.begin(disk);
   wr_seltrack_.begin(disk);
@@ -51,19 +57,23 @@ void Z80Mbc2Io::__beginIoDev(Z80Mbc2Dev &dev)
   staticSysFlags_ |= rtc->isAvailable() << MbcDevRdSYSFLAGS::RTC;
 }
 
-void Z80Mbc2Io::__initFromCfg(Z80Mbc2Dev &dev)
+void Z80Mbc2IoClass::__initFromCfg(void)
 {
   Z80Mbc2Cfg cfg;
 
-  cfg.begin(dev.getSd());
+  cfg.begin(dev_.getSd());
 
   staticSysFlags_ |= cfg.getAutoExecEn() << MbcDevRdSYSFLAGS::AUTOEXEC;
   wait_count_ = 1 << cfg.getClkMode();
+
+  irq_tty_rx_ = !!cfg.getIrqTtyRx();
+  if (irq_tty_rx_)
+    Serial.println(F("IOS: IRQ-TTY-RX flag is enabled."));
 }
 
-void Z80Mbc2Io::__initIoDevWr(Z80Mbc2Dev &dev)
+void Z80Mbc2IoClass::__initIoDevWr(void)
 {
-  auto *gpio = dev.getGpio();
+  auto *gpio = dev_.getGpio();
 
   for (uint8_t command = MbcIo::WR_BEGIN; command <= MbcIo::WR_END; command++)
     __setIoDevWr(command, &rdwr_nop_);
@@ -87,14 +97,14 @@ void Z80Mbc2Io::__initIoDevWr(Z80Mbc2Dev &dev)
   }
 }
 
-void Z80Mbc2Io::__setIoDevWr(uint8_t command, MbcDev *dev)
+void Z80Mbc2IoClass::__setIoDevWr(uint8_t command, MbcDev *dev)
 {
   io_dev_wr_[command - MbcIo::WR_BEGIN] = dev;
 }
 
-void Z80Mbc2Io::__initIoDevRd(Z80Mbc2Dev &dev)
+void Z80Mbc2IoClass::__initIoDevRd(void)
 {
-  auto *gpio = dev.getGpio();
+  auto *gpio = dev_.getGpio();
 
   for (uint8_t command = MbcIo::RD_BEGIN; command <= MbcIo::RD_END; command++)
     __setIoDevRd(command, &rdwr_nop_);
@@ -113,12 +123,12 @@ void Z80Mbc2Io::__initIoDevRd(Z80Mbc2Dev &dev)
   }
 }
 
-void Z80Mbc2Io::__setIoDevRd(uint8_t command, MbcDev *dev)
+void Z80Mbc2IoClass::__setIoDevRd(uint8_t command, MbcDev *dev)
 {
   io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }
 
-inline void Z80Mbc2Io::run(void)
+inline void Z80Mbc2IoClass::operateIo(void)
 {
   if (!pin_->getPIN_nWAIT())
   {
@@ -131,12 +141,12 @@ inline void Z80Mbc2Io::run(void)
   }
 }
 
-uint8_t Z80Mbc2Io::getSysFlag(void)
+uint8_t Z80Mbc2IoClass::getSysFlag(void)
 {
   return staticSysFlags_ | ((!!last_rx_is_empty_) << MbcDevRdSYSFLAGS::PREV_RX);
 }
 
-inline void Z80Mbc2Io::__runWrite(void)
+inline void Z80Mbc2IoClass::__runWrite(void)
 {
   _setAddress(pin_->getPIN_AD0());
   setData(pin_->getPORT_DATA());
@@ -157,7 +167,7 @@ inline void Z80Mbc2Io::__runWrite(void)
   pin_->setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
 }
 
-inline void Z80Mbc2Io::__runRead(void)
+inline void Z80Mbc2IoClass::__runRead(void)
 {
   _setAddress(pin_->getPIN_AD0());
   setData(0);
@@ -191,7 +201,7 @@ inline void Z80Mbc2Io::__runRead(void)
   pin_->setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
 }
 
-inline void Z80Mbc2Io::__runInterrupt(void)
+inline void Z80Mbc2IoClass::__runInterrupt(void)
 {
   // Control bus sequence to exit from a wait state (M interrupt cycle)
   pin_->setPIN_nBUSREQ_LOW();     // Request for a DMA
@@ -201,7 +211,7 @@ inline void Z80Mbc2Io::__runInterrupt(void)
   pin_->setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
 }
 
-inline void Z80Mbc2Io::__execWriteCommand(void)
+inline void Z80Mbc2IoClass::__execWriteCommand(void)
 {
   uint8_t command = getCommand();
 
@@ -214,7 +224,7 @@ inline void Z80Mbc2Io::__execWriteCommand(void)
   }
 }
 
-inline void Z80Mbc2Io::__execReadCommand(void)
+inline void Z80Mbc2IoClass::__execReadCommand(void)
 {
   uint8_t command = getCommand();
 
@@ -225,4 +235,49 @@ inline void Z80Mbc2Io::__execReadCommand(void)
     if (command != MbcIo::RD_DATETIME && command != MbcIo::RD_READSECT)
       setCommand(MbcIo::NO_OPERATION);
   }
+}
+
+// states
+
+void __Z80Mbc2IoStateInit::handle(Z80Mbc2IoClass *io)
+{
+  Z80Mbc2Dev &dev = io->dev_;
+  DevUser *user = dev.getUser();
+
+  if (!user->getKey())
+    io->state_ = &io->st_bootstrap_;
+  else
+    io->state_ = &io->st_menu_enter_;
+}
+
+void __Z80Mbc2IoStateMenuEnter::handle(Z80Mbc2IoClass *io)
+{
+  Z80Mbc2Dev &dev = io->dev_;
+
+  Z80Mbc2Menu.begin(dev);
+  Z80Mbc2Menu.enter();
+
+  io->state_ = &io->st_menu_run_;
+}
+
+void __Z80Mbc2IoStateMenuRun::handle(Z80Mbc2IoClass *io)
+{
+  if (!Z80Mbc2Menu.run())
+    io->state_ = &io->st_bootstrap_;
+}
+
+void __Z80Mbc2IoStateBootstrap::handle(Z80Mbc2IoClass *io)
+{
+  Z80Mbc2Dev &dev = io->dev_;
+  Z80Mbc2Loader &loader = io->loader_;
+
+  loader.begin(dev);
+  loader.bootstrap();
+
+  io->state_ = &io->st_run_;
+}
+
+void __Z80Mbc2IoStateRun::handle(Z80Mbc2IoClass *io)
+{
+  io->operateIo();
 }

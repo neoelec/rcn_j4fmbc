@@ -4,7 +4,8 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "j4fZ80Mbc2.h"
+#include "Z80Mbc2Cfg.h"
+#include "Z80Mbc2Pin.h"
 
 class Z80Mbc2Loader
 {

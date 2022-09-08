@@ -29,14 +29,16 @@ void Z80Mbc2MenuClass::enter(void)
   menu_cmd_.giveCmdPrompt();
 }
 
-void Z80Mbc2MenuClass::run(void)
+bool Z80Mbc2MenuClass::run(void)
 {
-  while (!isDone())
-  {
-    uint8_t cmd = menu_cmd_.UserRequest();
-    if (cmd)
-      menu_cmd_.ExeCommand(cmd);
-  }
+  if (isDone())
+    return false;
+
+  uint8_t cmd = menu_cmd_.UserRequest();
+  if (cmd)
+    menu_cmd_.ExeCommand(cmd);
+
+  return true;
 }
 
 bool Z80Mbc2MenuClass::isDone(void)

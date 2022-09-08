@@ -4,7 +4,7 @@
 #include <j4fDev.h>
 #include <SerialMenuCmd.h>
 
-#include "j4fZ80Mbc2.h"
+#include "Z80Mbc2Cfg.h"
 
 extern void z80mbc2MenuBegin(Z80Mbc2Dev &dev);
 extern void z80mbc2MenuEnter(void);
@@ -15,7 +15,7 @@ class Z80Mbc2MenuClass
 public:
   void begin(Z80Mbc2Dev &dev);
   void enter(void);
-  void run(void);
+  bool run(void);
   SerialMenuCmd *getMenuCmd(void);
   bool isDone(void);
   void doCmdChangeBootMode(void);
