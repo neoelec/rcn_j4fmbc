@@ -1,3 +1,3 @@
-#ifndef Z80MBC2_ARCH
+#ifndef J4F_MBC_ARCH
 #error "Not a supported architecture!"
 #endif
