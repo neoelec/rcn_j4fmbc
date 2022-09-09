@@ -72,8 +72,7 @@ private:
 private:
   V20MbcDev dev_;
   V20MbcLoader loader_;
-
-  V20MbcPin *pin_;
+  V20MbcPin pin_;
   uint8_t staticSysFlags_;
   uint8_t autoexec_en_;
   uint8_t wait_count_;

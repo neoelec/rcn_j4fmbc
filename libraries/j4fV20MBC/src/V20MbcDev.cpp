@@ -27,8 +27,6 @@ void V20MbcDev::begin(void)
   user_.begin(PIN_USER);
 
   disk_.begin(&sd_);
-
-  pin_.begin();
 }
 
 DevGpio *V20MbcDev::getGpio(void)
@@ -59,9 +57,4 @@ DevUser *V20MbcDev::getUser(void)
 MbcDisk *V20MbcDev::getDisk(void)
 {
   return &disk_;
-}
-
-V20MbcPin *V20MbcDev::getPin(void)
-{
-  return &pin_;
 }

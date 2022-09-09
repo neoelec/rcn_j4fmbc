@@ -4,12 +4,12 @@
 
 #include "j4fV20Mbc.h"
 
-void V20MbcLoader::begin(V20MbcDev &dev)
+void V20MbcLoader::begin(V20MbcDev &dev, V20MbcPin *pin)
 {
   clock_ = dev.getClock();
   sd_ = dev.getSd();
   disk_ = dev.getDisk();
-  pin_ = dev.getPin();
+  pin_ = pin;
 
   // Reset the V20 CPU and load a byte into RAM just to pulse the ALE line resetting the HALT
   // status led if turned on at power up (see U7 in the A250220 schematic).

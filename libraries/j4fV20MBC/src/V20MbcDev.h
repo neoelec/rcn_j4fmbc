@@ -4,8 +4,6 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "V20MbcPin.h"
-
 class __V20MbcDevMcuVariant
 {
 public:
@@ -29,7 +27,6 @@ public:
   DevTty *getTty(void);
   DevUser *getUser(void);
   MbcDisk *getDisk(void);
-  V20MbcPin *getPin(void);
 
 private:
   DevGpio gpio_;
@@ -38,7 +35,6 @@ private:
   DevTty tty_;
   DevUser user_;
   MbcDisk disk_;
-  V20MbcPin pin_;
 };
 
 #endif // __INTERNAL__V20MBCDEV_H__

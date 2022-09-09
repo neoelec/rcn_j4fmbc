@@ -25,7 +25,7 @@ void V20MbcIoClass::__beginIoDev(void)
   auto *disk = dev_.getDisk();
   auto *rtc = dev_.getRtc();
 
-  pin_ = dev_.getPin();
+  pin_.begin();
 
   MbcDevWrSELDISK.begin(disk);
   MbcDevWrSELTRACK.begin(disk);
@@ -121,20 +121,20 @@ void V20MbcIoClass::__setIoDevRd(uint8_t command, MbcDev *dev)
 
 inline void V20MbcIoClass::runIo(void)
 {
-  if (!pin_->getPIN_READY())
+  if (!pin_.getPIN_READY())
   {
-    if (!pin_->getPIN_nWR())
+    if (!pin_.getPIN_nWR())
       __runWrite();
-    else if (!pin_->getPIN_nRD())
+    else if (!pin_.getPIN_nRD())
       __runRead();
-    else if (!pin_->getPIN_nINTA())
+    else if (!pin_.getPIN_nINTA())
       __runInterrupt();
     else
       __runHalt();
   }
 
   if (Serial.available() && getIrq(MbcIo::IRQ_RX))
-    pin_->setPIN_INTR_HIGH();
+    pin_.setPIN_INTR_HIGH();
 }
 
 uint8_t V20MbcIoClass::getSysFlag(void)
@@ -144,8 +144,8 @@ uint8_t V20MbcIoClass::getSysFlag(void)
 
 inline void V20MbcIoClass::__runWrite(void)
 {
-  _setAddress(pin_->getPIN_AD1AD0());
-  setData(pin_->getPORT_DATA());
+  _setAddress(pin_.getPIN_AD1AD0());
+  setData(pin_.getPORT_DATA());
 
   switch (getAddress())
   {
@@ -165,19 +165,19 @@ inline void V20MbcIoClass::__runWrite(void)
   }
 
   // Control bus sequence to exit from a wait state (I/O bus write cycle)
-  pin_->setPIN_nRDYRES_LOW();  // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
-  pin_->setPIN_nRDYRES_HIGH(); // RDYRES_ = HIGH
+  pin_.setPIN_nRDYRES_LOW();  // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
+  pin_.setPIN_nRDYRES_HIGH(); // RDYRES_ = HIGH
 
   // Time critical section!!!
   noInterrupts();               // !!! Start of a time critical section. No interrupt allowed
-  pin_->setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
-  pin_->setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
+  pin_.setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
+  pin_.setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
   interrupts();                 // !!! End of a time critical section. Interrupt resumed
 }
 
 inline void V20MbcIoClass::__runRead(void)
 {
-  _setAddress(pin_->getPIN_AD1AD0());
+  _setAddress(pin_.getPIN_AD1AD0());
   setData(0);
 
   switch (getAddress())
@@ -188,7 +188,7 @@ inline void V20MbcIoClass::__runRead(void)
 
   case 1: // AD1-AD0 = 1 (I/O read address = 0x01): SERIAL RX.
     MbcDevRdSERIALRX.run(this);
-    pin_->setPIN_INTR_LOW(); // INTR = LOW: Reset the INTR signal (if used).
+    pin_.setPIN_INTR_LOW(); // INTR = LOW: Reset the INTR signal (if used).
     break;
 
   case 2: // AD1-AD0 = 2 (I/O read address = 0x02): SYSFLAGS.
@@ -200,41 +200,41 @@ inline void V20MbcIoClass::__runRead(void)
   }
 
   // Current output on data bus
-  pin_->setPORT_DATA(getData());
+  pin_.setPORT_DATA(getData());
 
   // Control bus sequence to exit from a wait state (M I/O read cycle)
-  pin_->setPIN_nRDYRES_LOW();     // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
+  pin_.setPIN_nRDYRES_LOW();     // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
   delayMicroseconds(wait_count_); // Wait 2us just to be sure that the V20 reads the data and goes HiZ
-  pin_->releasePORT_DATA();       //
-  pin_->setPIN_nRDYRES_HIGH();    // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
+  pin_.releasePORT_DATA();       //
+  pin_.setPIN_nRDYRES_HIGH();    // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
 
   // Time critical section!!!
   noInterrupts();               // !!! Start of a time critical section. No interrupt allowed
-  pin_->setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
-  pin_->setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
+  pin_.setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
+  pin_.setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
   interrupts();                 // !!! End of a time critical section. Interrupt resumed
 }
 
 inline void V20MbcIoClass::__runInterrupt(void)
 {
   // Now CPU is in the first of the two INTA_ bus cycles
-  pin_->setPIN_INTR_LOW(); // INTR = LOW: Reset the INTR signal
+  pin_.setPIN_INTR_LOW(); // INTR = LOW: Reset the INTR signal
 
   // Current output on data bus
   setData(33); // For now it is fixed
-  pin_->setPORT_DATA(getData());
+  pin_.setPORT_DATA(getData());
 
   // Control bus sequence to exit from a wait state (Interrupt)
-  pin_->setPIN_nRDYRES_LOW();     // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
+  pin_.setPIN_nRDYRES_LOW();     // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
   delayMicroseconds(wait_count_); // Wait 2us (8 bus cycles @ 4MHz) just to be sure to execute both
   delayMicroseconds(wait_count_); //  the two INTA bus cycles
-  pin_->releasePORT_DATA();       //
-  pin_->setPIN_nRDYRES_HIGH();    // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
+  pin_.releasePORT_DATA();       //
+  pin_.setPIN_nRDYRES_HIGH();    // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
 
   // Time critical section!!!
   noInterrupts();               // !!! Start of a time critical section. No interrupt allowed
-  pin_->setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
-  pin_->setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
+  pin_.setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
+  pin_.setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
   interrupts();                 // !!! End of a time critical section. Interrupt resumed
 }
 
@@ -310,8 +310,9 @@ void __V20MbcIoStateBootstrap::handle(V20MbcIoClass *io)
 {
   V20MbcDev &dev = io->dev_;
   V20MbcLoader &loader = io->loader_;
+  V20MbcPin *pin = &io->pin_;
 
-  loader.begin(dev);
+  loader.begin(dev, pin);
   loader.bootstrap();
 
   io->state_ = &io->st_run_;
