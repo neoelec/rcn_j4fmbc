@@ -212,6 +212,11 @@ uint8_t Z80Mbc2Cfg::getBootMode(void)
   return boot_mode_;
 }
 
+uint8_t Z80Mbc2Cfg::getBoardType(void)
+{
+  return MbcBoardType.getBoardType();
+}
+
 uint8_t Z80Mbc2Cfg::getAutoExecEn(void)
 {
   return autoexec_en_;
@@ -229,6 +234,11 @@ void Z80Mbc2Cfg::setBootMode(uint8_t boot_mode)
   __beginBootMode(boot_mode_);
 
   EEPROM.update(IDX_BOOT_MODE, boot_mode_);
+}
+
+void Z80Mbc2Cfg::setBoardType(uint8_t board_type)
+{
+  MbcBoardType.setBoardType(board_type);
 }
 
 void Z80Mbc2Cfg::setAutoExecEn(uint8_t autoexec_en)

@@ -23,10 +23,12 @@ public:
   int8_t getDiskSet(void);
   uint8_t getIrqTtyRx(void);
   uint8_t getBootMode(void);
+  uint8_t getBoardType(void);
   uint8_t getAutoExecEn(void);
   uint8_t getClkMode(void);
   uint8_t getNrBootMode(void);
   void setBootMode(uint8_t boot_mode);
+  void setBoardType(uint8_t board_type);
   void setAutoExecEn(uint8_t autoexec_en);
   void setClkMode(uint8_t clock_mode);
   void printCfg(void);

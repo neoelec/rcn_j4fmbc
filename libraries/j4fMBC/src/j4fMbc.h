@@ -9,6 +9,7 @@
 #define likely(expr) __builtin_expect(!!(expr), 1)
 #endif
 
+#include "MbcBoardType.h"
 #include "MbcIo.h"
 #include "MbcDisk.h"
 #include "MbcDevIo.h"

@@ -248,6 +248,11 @@ uint8_t V20MbcCfg::getBootMode(void)
   return boot_mode_;
 }
 
+uint8_t V20MbcCfg::getBoardType(void)
+{
+  return MbcBoardType.getBoardType();
+}
+
 uint8_t V20MbcCfg::getAutoExecEn(void)
 {
   return autoexec_en_;
@@ -265,6 +270,11 @@ void V20MbcCfg::setBootMode(uint8_t boot_mode)
   __beginBootMode(boot_mode_);
 
   EEPROM.update(IDX_BOOT_MODE, boot_mode_);
+}
+
+void V20MbcCfg::setBoardType(uint8_t board_type)
+{
+  MbcBoardType.setBoardType(board_type);
 }
 
 void V20MbcCfg::setAutoExecEn(uint8_t autoexec_en)

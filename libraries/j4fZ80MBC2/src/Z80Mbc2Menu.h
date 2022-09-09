@@ -19,6 +19,7 @@ public:
   void doCmdChangeClockMode(void);
   void doCmdPrintConfiguration(void);
   void doCmdAdjustRtc(void);
+  void doCmdChangeBoardType(void);
   void doCmdExit(void);
   void doCmdHelp(void);
 

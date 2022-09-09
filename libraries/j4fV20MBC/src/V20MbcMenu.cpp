@@ -182,6 +182,47 @@ void V20MbcMenuClass::doCmdPrintConfiguration(void)
   menu_cmd_.giveCmdPrompt();
 }
 
+void V20MbcMenuClass::doCmdChangeBoardType(void)
+{
+  String str_bm;
+  long board_type;
+  uint8_t nr_board_type = MbcBoardTypeClass::NR_BOARD_TYPE;
+
+  Serial.println();
+  Serial.printf(F("IOS: BOARD TYPE [0-%d]"), nr_board_type - 1);
+  for (long i = 0; i < nr_board_type; i++)
+  {
+    Serial.println();
+    Serial.printf(F("%2ld - "), i);
+    MbcBoardType.printBoardType(static_cast<uint8_t>(i));
+  }
+
+  if (!menu_cmd_.getStrValue(str_bm) || !str_bm.length())
+  {
+    board_type = MbcBoardType.getBoardType();
+    goto __exit;
+  }
+
+  board_type = str_bm.toInt();
+
+  if (board_type < 0 || board_type >= nr_board_type)
+  {
+    Serial.println();
+    Serial.printf(F("Wrong Value %ld. It should be 0 <= board_type <= %ld"),
+                  board_type, nr_board_type - 1);
+    Serial.println();
+    goto __no_change;
+  }
+
+__exit:
+  MbcBoardType.setBoardType(static_cast<uint8_t>(board_type));
+  Serial.println();
+  MbcBoardType.printBoardType(static_cast<uint8_t>(board_type));
+  Serial.println();
+__no_change:
+  menu_cmd_.giveCmdPrompt();
+}
+
 void V20MbcMenuClass::doCmdExit(void)
 {
   done_ = true;
@@ -224,6 +265,7 @@ void V20MbcMenuClass::__initializeMenuCmd(void)
   static tMenuCmdTxt txt_a[] PROGMEM = "a - Toggle AUTOEXEC";
   static tMenuCmdTxt txt_c[] PROGMEM = "c - Select CLK Mode";
   static tMenuCmdTxt txt_t[] PROGMEM = "t - Adjust RTC";
+  static tMenuCmdTxt txt_y[] PROGMEM = "y - Change Menu";
   static tMenuCmdTxt txt_x[] PROGMEM = "x - Exit";
   static tMenuCmdTxt txt__[] PROGMEM = "? - Help";
   static stMenuCmd menu_list[] = {
@@ -239,6 +281,8 @@ void V20MbcMenuClass::__initializeMenuCmd(void)
        { V20MbcMenu.doCmdChangeClockMode(); }},
       {txt_t, 't', []()
        { V20MbcMenu.doCmdAdjustRtc(); }},
+      {txt_y, 'y', []()
+       { V20MbcMenu.doCmdChangeBoardType(); }},
       {txt_x, 'x', []()
        { V20MbcMenu.doCmdExit(); }},
       {txt__, '?', []()
