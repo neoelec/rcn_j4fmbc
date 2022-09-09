@@ -46,11 +46,6 @@ bool Z80Mbc2MenuClass::isDone(void)
   return done_;
 }
 
-SerialMenuCmd *Z80Mbc2MenuClass::getMenuCmd(void)
-{
-  return &menu_cmd_;
-}
-
 void Z80Mbc2MenuClass::doCmdChangeBootMode(void)
 {
   String str_bm;

@@ -12,7 +12,6 @@ public:
   void begin(void);
   void enter(void);
   bool run(void);
-  SerialMenuCmd *getMenuCmd(void);
   bool isDone(void);
   void doCmdChangeBootMode(void);
   void doCmdListBootMode(void);
