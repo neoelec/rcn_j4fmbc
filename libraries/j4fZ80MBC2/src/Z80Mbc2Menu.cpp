@@ -8,10 +8,10 @@
 
 Z80Mbc2MenuClass Z80Mbc2Menu;
 
-void Z80Mbc2MenuClass::begin(Z80Mbc2Dev &dev)
+void Z80Mbc2MenuClass::begin(void)
 {
-  rtc_ = dev.getRtc();
-  sd_ = dev.getSd();
+  rtc_ = MbcDev.getRtc();
+  sd_ = MbcDev.getSd();
 
   __initializeMenuCmd();
 }

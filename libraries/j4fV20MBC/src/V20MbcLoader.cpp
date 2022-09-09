@@ -4,11 +4,11 @@
 
 #include "j4fV20Mbc.h"
 
-void V20MbcLoader::begin(V20MbcDev &dev, V20MbcPin *pin)
+void V20MbcLoader::begin(V20MbcPin *pin)
 {
-  clock_ = dev.getClock();
-  sd_ = dev.getSd();
-  disk_ = dev.getDisk();
+  clock_ = MbcDev.getClock();
+  sd_ = MbcDev.getSd();
+  disk_ = MbcDev.getDisk();
   pin_ = pin;
 
   // Reset the V20 CPU and load a byte into RAM just to pulse the ALE line resetting the HALT

@@ -6,14 +6,10 @@
 
 #include "Z80Mbc2Cfg.h"
 
-extern void z80mbc2MenuBegin(Z80Mbc2Dev &dev);
-extern void z80mbc2MenuEnter(void);
-extern void z80mbc2MenuRun(void);
-
 class Z80Mbc2MenuClass
 {
 public:
-  void begin(Z80Mbc2Dev &dev);
+  void begin(void);
   void enter(void);
   bool run(void);
   SerialMenuCmd *getMenuCmd(void);

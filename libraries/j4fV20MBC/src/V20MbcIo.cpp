@@ -2,13 +2,22 @@
 
 #include "j4fV20Mbc.h"
 
+#define PIN_USER 13     // PD5 pin 19   Led USER and key (led USER is ON if LOW)
+#define PIN_MCU_nRTS 11 // PD3 pin 17   * RESERVED - NOT USED *
+#define PIN_MCU_nCTS 12 // PD4 pin 18   Used only to reset uTerm at boot time
+
 V20MbcIoClass V20MbcIo;
 
 void V20MbcIoClass::begin(void)
 {
   staticSysFlags_ = 0;
 
-  dev_.begin();
+  MbcDev.begin(PIN_USER, PIN_MCU_nRTS, PIN_MCU_nCTS);
+
+  Serial.println();
+  Serial.println(F("V20-MBC - A250220"));
+  Serial.println(F("IOS - I/O Subsystem - S260320-R230520 + Raccoon's MOD"));
+  Serial.println();
 
   __beginIoDev();
   __initFromCfg();
@@ -20,10 +29,10 @@ void V20MbcIoClass::begin(void)
 
 void V20MbcIoClass::__beginIoDev(void)
 {
-  auto *gpio = dev_.getGpio();
-  auto *user = dev_.getUser();
-  auto *disk = dev_.getDisk();
-  auto *rtc = dev_.getRtc();
+  auto *gpio = MbcDev.getGpio();
+  auto *user = MbcDev.getUser();
+  auto *disk = MbcDev.getDisk();
+  auto *rtc = MbcDev.getRtc();
 
   pin_.begin();
 
@@ -56,7 +65,7 @@ void V20MbcIoClass::__initFromCfg(void)
 {
   V20MbcCfg cfg;
 
-  cfg.begin(dev_.getSd());
+  cfg.begin(MbcDev.getSd());
 
   staticSysFlags_ |= cfg.getAutoExecEn() << MbcDevRdSYSFLAGSClass::AUTOEXEC;
   wait_count_ = 1 << cfg.getClkMode();
@@ -64,7 +73,7 @@ void V20MbcIoClass::__initFromCfg(void)
 
 void V20MbcIoClass::__initIoDevWr(void)
 {
-  auto *gpio = dev_.getGpio();
+  auto *gpio = MbcDev.getGpio();
 
   for (uint8_t command = MbcIo::WR_BEGIN; command <= MbcIo::WR_END; command++)
     __setIoDevWr(command, &MbcDevRdWrNOP);
@@ -95,7 +104,7 @@ void V20MbcIoClass::__setIoDevWr(uint8_t command, MbcDevIo *dev)
 
 void V20MbcIoClass::__initIoDevRd(void)
 {
-  auto *gpio = dev_.getGpio();
+  auto *gpio = MbcDev.getGpio();
 
   for (uint8_t command = MbcIo::RD_BEGIN; command <= MbcIo::RD_END; command++)
     __setIoDevRd(command, &MbcDevRdWrNOP);
@@ -281,8 +290,7 @@ inline void V20MbcIoClass::__execReadOpcode(void)
 
 void __V20MbcIoStateInit::handle(V20MbcIoClass *io)
 {
-  V20MbcDev &dev = io->dev_;
-  DevUser *user = dev.getUser();
+  DevUser *user = MbcDev.getUser();
 
   if (!user->getKey())
     io->state_ = &io->st_bootstrap_;
@@ -292,9 +300,7 @@ void __V20MbcIoStateInit::handle(V20MbcIoClass *io)
 
 void __V20MbcIoStateMenuEnter::handle(V20MbcIoClass *io)
 {
-  V20MbcDev &dev = io->dev_;
-
-  V20MbcMenu.begin(dev);
+  V20MbcMenu.begin();
   V20MbcMenu.enter();
 
   io->state_ = &io->st_menu_run_;
@@ -308,11 +314,10 @@ void __V20MbcIoStateMenuRun::handle(V20MbcIoClass *io)
 
 void __V20MbcIoStateBootstrap::handle(V20MbcIoClass *io)
 {
-  V20MbcDev &dev = io->dev_;
   V20MbcLoader &loader = io->loader_;
   V20MbcPin *pin = &io->pin_;
 
-  loader.begin(dev, pin);
+  loader.begin(pin);
   loader.bootstrap();
 
   io->state_ = &io->st_run_;

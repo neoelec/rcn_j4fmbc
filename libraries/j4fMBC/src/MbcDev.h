@@ -1,10 +1,11 @@
-#ifndef __INTERNAL__V20MBCDEV_H__
-#define __INTERNAL__V20MBCDEV_H__
+#ifndef __INTERNAL__MBCDEV_H__
+#define __INTERNAL__MBCDEV_H__
 
 #include <j4fDev.h>
-#include <j4fMbc.h>
 
-class __V20MbcDevMcuVariant
+#include "MbcDevDisk.h"
+
+class __MbcDevMcuVariant
 {
 public:
   DevClock *getClock(void);
@@ -17,10 +18,10 @@ protected:
 #endif
 };
 
-class V20MbcDev : public __V20MbcDevMcuVariant
+class MbcDevClass : public __MbcDevMcuVariant
 {
 public:
-  void begin(void);
+  void begin(uint8_t pin_user, uint8_t pin_rst, uint8_t pin_cts);
   DevGpio *getGpio(void);
   DevRtc *getRtc(void);
   DevSd *getSd(void);
@@ -37,4 +38,6 @@ private:
   MbcDisk disk_;
 };
 
-#endif // __INTERNAL__V20MBCDEV_H__
+extern MbcDevClass MbcDev;
+
+#endif // __INTERNAL__MBCDEV_H__

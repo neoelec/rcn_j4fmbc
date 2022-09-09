@@ -4,7 +4,6 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "Z80Mbc2Dev.h"
 #include "Z80Mbc2DevBank.h"
 #include "Z80Mbc2Loader.h"
 #include "Z80Mbc2Pin.h"
@@ -70,7 +69,6 @@ private:
   inline void __execReadCommand(void);
 
 private:
-  Z80Mbc2Dev dev_;
   Z80Mbc2Loader loader_;
   Z80Mbc2Pin pin_;
   uint8_t staticSysFlags_;

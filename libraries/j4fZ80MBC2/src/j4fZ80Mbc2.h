@@ -15,7 +15,6 @@
 
 #include "Z80Mbc2Cfg.h"
 #include "Z80Mbc2Pin.h"
-#include "Z80Mbc2Dev.h"
 #include "Z80Mbc2DevBank.h"
 #include "Z80Mbc2Io.h"
 #include "Z80Mbc2Loader.h"

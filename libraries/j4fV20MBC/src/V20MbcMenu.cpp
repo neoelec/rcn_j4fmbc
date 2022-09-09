@@ -8,10 +8,10 @@
 
 V20MbcMenuClass V20MbcMenu;
 
-void V20MbcMenuClass::begin(V20MbcDev &dev)
+void V20MbcMenuClass::begin(void)
 {
-  rtc_ = dev.getRtc();
-  sd_ = dev.getSd();
+  rtc_ = MbcDev.getRtc();
+  sd_ = MbcDev.getSd();
 
   __initializeMenuCmd();
 }

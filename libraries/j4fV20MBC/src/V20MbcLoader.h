@@ -10,7 +10,7 @@
 class V20MbcLoader
 {
 public:
-  void begin(V20MbcDev &dev, V20MbcPin *pin);
+  void begin(V20MbcPin *pin);
   void bootstrap(void);
 
 private:

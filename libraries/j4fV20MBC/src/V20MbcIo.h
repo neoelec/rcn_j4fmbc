@@ -4,7 +4,6 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "V20MbcDev.h"
 #include "V20MbcLoader.h"
 #include "V20MbcPin.h"
 
@@ -70,7 +69,6 @@ private:
   inline void __execReadOpcode(void);
 
 private:
-  V20MbcDev dev_;
   V20MbcLoader loader_;
   V20MbcPin pin_;
   uint8_t staticSysFlags_;

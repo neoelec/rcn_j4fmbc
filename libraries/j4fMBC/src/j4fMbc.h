@@ -19,5 +19,6 @@
 #include "MbcDevSysFlags.h"
 #include "MbcDevTty.h"
 #include "MbcDevUser.h"
+#include "MbcDev.h"
 
 #endif // __J4FMBC_H__

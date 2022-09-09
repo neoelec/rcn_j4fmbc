@@ -9,7 +9,7 @@
 class V20MbcMenuClass
 {
 public:
-  void begin(V20MbcDev &dev);
+  void begin(void);
   void enter(void);
   bool run(void);
   SerialMenuCmd *getMenuCmd(void);
