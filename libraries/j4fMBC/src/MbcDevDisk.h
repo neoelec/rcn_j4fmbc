@@ -47,7 +47,7 @@ protected:
 //         a maximum of 16 disks)
 // NOTE 2: Because SELDISK opens the "disk file" used for disk emulation, before using WRITESECT or READSECT
 //         a SELDISK must be performed at first.
-class MbcDevWrSELDISKClass : public MbcDev, public MbcDevDisk
+class MbcDevWrSELDISKClass : public MbcDevIo, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
@@ -81,7 +81,7 @@ inline void MbcDevWrSELDISKClass::run(MbcIo *io)
 // NOTE 1: Allowed track numbers are in the range [0..511] (512 tracks)
 // NOTE 2: Before a WRITESECT or READSECT operation at least a SELSECT or a SELTRAK operation
 //         must be performed
-class MbcDevWrSELTRACKClass : public MbcDev, public MbcDevDisk
+class MbcDevWrSELTRACKClass : public MbcDevIo, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
@@ -111,7 +111,7 @@ inline void MbcDevWrSELTRACKClass::run(MbcIo *io)
 // NOTE 1: Allowed sector numbers are in the range [0..31] (32 sectors)
 // NOTE 2: Before a WRITESECT or READSECT operation at least a SELSECT or a SELTRAK operation
 //         must be performed
-class MbcDevWrSELSECTClass : public MbcDev, public MbcDevDisk
+class MbcDevWrSELSECTClass : public MbcDevIo, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
@@ -151,7 +151,7 @@ inline void MbcDevWrSELSECTClass::run(MbcIo *io)
 // NOTE 2: Remember to open the right "disk file" at first using the SELDISK opcode
 // NOTE 3: The write finalization on SD "disk file" is executed only on the 512th data byte exchange, so be
 //         sure that exactly 512 data bytes are exchanged.
-class MbcDevWrWRITESECTClass : public MbcDev, public MbcDevDisk
+class MbcDevWrWRITESECTClass : public MbcDevIo, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
@@ -197,7 +197,7 @@ inline void MbcDevWrWRITESECTClass::run(MbcIo *io)
 // NOTE 2: Error codes from 0 to 6 come from the PetitFS library implementation
 // NOTE 3: ERRDISK must not be used to read the resulting error code after a SDMOUNT operation
 //         (see the SDMOUNT opcode)
-class MbcDevRdERRDISKClass : public MbcDev, public MbcDevDisk
+class MbcDevRdERRDISKClass : public MbcDevIo, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
@@ -234,7 +234,7 @@ inline void MbcDevRdERRDISKClass::run(MbcIo *io)
 //
 // NOTE 1: Before a READSECT operation at least a SELTRACK or a SELSECT must be always performed
 // NOTE 2: Remember to open the right "disk file" at first using the SELDISK opcode
-class MbcDevRdREADSECTClass : public MbcDev, public MbcDevDisk
+class MbcDevRdREADSECTClass : public MbcDevIo, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
@@ -259,7 +259,7 @@ inline void MbcDevRdREADSECTClass::run(MbcIo *io)
 // NOTE 2: For error codes explanation see ERRDISK opcode
 // NOTE 3: Only for this disk opcode, the resulting error is read as a data byte without using the
 //         ERRDISK opcode
-class MbcDevRdSDMOUNTClass : public MbcDev, public MbcDevDisk
+class MbcDevRdSDMOUNTClass : public MbcDevIo, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);

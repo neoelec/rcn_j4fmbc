@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-class MbcDev;
+class MbcDevIo;
 
 class MbcIo
 {

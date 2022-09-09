@@ -88,7 +88,7 @@ void V20MbcIoClass::__initIoDevWr(void)
   }
 }
 
-void V20MbcIoClass::__setIoDevWr(uint8_t command, MbcDev *dev)
+void V20MbcIoClass::__setIoDevWr(uint8_t command, MbcDevIo *dev)
 {
   io_dev_wr_[command - MbcIo::WR_BEGIN] = dev;
 }
@@ -114,7 +114,7 @@ void V20MbcIoClass::__initIoDevRd(void)
   }
 }
 
-void V20MbcIoClass::__setIoDevRd(uint8_t command, MbcDev *dev)
+void V20MbcIoClass::__setIoDevRd(uint8_t command, MbcDevIo *dev)
 {
   io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }

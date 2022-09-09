@@ -3,7 +3,7 @@
 
 #include "j4fMbc.h"
 
-class MbcDevRdSYSFLAGSClass : public MbcDev
+class MbcDevRdSYSFLAGSClass : public MbcDevIo
 {
 public:
   enum {

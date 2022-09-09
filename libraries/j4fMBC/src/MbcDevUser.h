@@ -22,7 +22,7 @@ protected:
 //                            ---------------------------------------------------------
 //                              x  x  x  x  x  x  x  0    USER Led off
 //                              x  x  x  x  x  x  x  1    USER Led on
-class MbcDevWrUSERLEDClass : public MbcDev, public MbcDevUser
+class MbcDevWrUSERLEDClass : public MbcDevIo, public MbcDevUser
 {
 public:
   inline void run(MbcIo *io);
@@ -43,7 +43,7 @@ inline void MbcDevWrUSERLEDClass::run(MbcIo *io)
 //                            ---------------------------------------------------------
 //                              0  0  0  0  0  0  0  0    USER Key not pressed
 //                              0  0  0  0  0  0  0  1    USER Key pressed
-class MbcDevRdUSERKEYClass : public MbcDev, public MbcDevUser
+class MbcDevRdUSERKEYClass : public MbcDevIo, public MbcDevUser
 {
 public:
   inline void run(MbcIo *io);

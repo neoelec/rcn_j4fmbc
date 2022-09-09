@@ -60,8 +60,8 @@ private:
   void __initFromCfg(void);
   void __initIoDevWr(void);
   void __initIoDevRd(void);
-  void __setIoDevWr(uint8_t command, MbcDev *dev);
-  void __setIoDevRd(uint8_t command, MbcDev *dev);
+  void __setIoDevWr(uint8_t command, MbcDevIo *dev);
+  void __setIoDevRd(uint8_t command, MbcDevIo *dev);
   inline void __runWrite(void);
   inline void __runRead(void);
   inline void __runInterrupt(void);
@@ -84,8 +84,8 @@ private:
   __V20MbcIoStateBootstrap st_bootstrap_;
   __V20MbcIoStateRun st_run_;
 
-  MbcDev *io_dev_wr_[MbcIo::WR_NR_CMD];
-  MbcDev *io_dev_rd_[MbcIo::RD_NR_CMD];
+  MbcDevIo *io_dev_wr_[MbcIo::WR_NR_CMD];
+  MbcDevIo *io_dev_rd_[MbcIo::RD_NR_CMD];
 
   friend class __V20MbcIoState;
   friend class __V20MbcIoStateInit;

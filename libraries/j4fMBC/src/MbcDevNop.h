@@ -3,7 +3,7 @@
 
 #include "j4fMbc.h"
 
-class MbcDevRdWrNOPClass : public MbcDev
+class MbcDevRdWrNOPClass : public MbcDevIo
 {
 public:
   inline void run(MbcIo *io);

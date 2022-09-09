@@ -31,7 +31,7 @@ protected:
 // NOTE 1: If RTC is not found all read values wil be = 0
 // NOTE 2: Overread data (more then 7 bytes read) will be = 0
 // NOTE 3: The temperature (Celsius) is a byte with two complement binary format [-128..127]
-class MbcDevRdDATETIMEClass : public MbcDev, public MbcDevRtc
+class MbcDevRdDATETIMEClass : public MbcDevIo, public MbcDevRtc
 {
 public:
   inline void run(MbcIo *io);

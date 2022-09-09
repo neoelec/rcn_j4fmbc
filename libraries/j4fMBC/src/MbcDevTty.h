@@ -12,7 +12,7 @@
 // NOTE 1: If there is no input char, a value 0xFF is forced as input char.
 // NOTE 2: The INTR signal is always reset (set to LOW) after this I/O operation.
 // NOTE 3: This I/O do not require any previous STORE OPCODE operation.
-class MbcDevRdSERIALRXClass : public MbcDev
+class MbcDevRdSERIALRXClass : public MbcDevIo
 {
 public:
   inline void run(MbcIo *io);
@@ -30,7 +30,7 @@ inline void MbcDevRdSERIALRXClass::run(MbcIo *io)
 //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
 //                            ---------------------------------------------------------
 //                             D7 D6 D5 D4 D3 D2 D1 D0    ASCII char to be sent to serial
-class MbcDevWrSERIALTXClass : public MbcDev
+class MbcDevWrSERIALTXClass : public MbcDevIo
 {
 public:
   inline void run(MbcIo *io);
@@ -50,7 +50,7 @@ inline void MbcDevWrSERIALTXClass::run(MbcIo *io)
 //                              x  x  x  x  x  x  x  1    Rx IRQ on
 //
 // NOTE: The default value after a reset/power on is 0 (Rx IRQ off)
-class MbcDevWrRXIRQFLAGClass : public MbcDev
+class MbcDevWrRXIRQFLAGClass : public MbcDevIo
 {
 public:
   inline void run(MbcIo *io);
@@ -70,7 +70,7 @@ inline void MbcDevWrRXIRQFLAGClass::run(MbcIo *io)
 //
 // NOTE: This opcode is intended to avoid delays in serial Tx operations, as the IOS hold the V20
 //       in a wait status if the TX buffer is full.
-class MbcDevRdATXBUFFClass : public MbcDev
+class MbcDevRdATXBUFFClass : public MbcDevIo
 {
 public:
   inline void run(MbcIo *io);

@@ -95,7 +95,7 @@ void Z80Mbc2IoClass::__initIoDevWr(void)
   }
 }
 
-void Z80Mbc2IoClass::__setIoDevWr(uint8_t command, MbcDev *dev)
+void Z80Mbc2IoClass::__setIoDevWr(uint8_t command, MbcDevIo *dev)
 {
   io_dev_wr_[command - MbcIo::WR_BEGIN] = dev;
 }
@@ -121,7 +121,7 @@ void Z80Mbc2IoClass::__initIoDevRd(void)
   }
 }
 
-void Z80Mbc2IoClass::__setIoDevRd(uint8_t command, MbcDev *dev)
+void Z80Mbc2IoClass::__setIoDevRd(uint8_t command, MbcDevIo *dev)
 {
   io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }
