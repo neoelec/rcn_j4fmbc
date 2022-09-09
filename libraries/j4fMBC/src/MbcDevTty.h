@@ -12,13 +12,13 @@
 // NOTE 1: If there is no input char, a value 0xFF is forced as input char.
 // NOTE 2: The INTR signal is always reset (set to LOW) after this I/O operation.
 // NOTE 3: This I/O do not require any previous STORE OPCODE operation.
-class MbcDevRdSERIALRX : public MbcDev
+class MbcDevRdSERIALRXClass : public MbcDev
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdSERIALRX::run(MbcIo *io)
+inline void MbcDevRdSERIALRXClass::run(MbcIo *io)
 {
   if (unlikely(Serial.available() > 0))
     io->setData(Serial.read());
@@ -30,13 +30,13 @@ inline void MbcDevRdSERIALRX::run(MbcIo *io)
 //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
 //                            ---------------------------------------------------------
 //                             D7 D6 D5 D4 D3 D2 D1 D0    ASCII char to be sent to serial
-class MbcDevWrSERIALTX : public MbcDev
+class MbcDevWrSERIALTXClass : public MbcDev
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrSERIALTX::run(MbcIo *io)
+inline void MbcDevWrSERIALTXClass::run(MbcIo *io)
 {
   Serial.write(io->getData());
 }
@@ -50,13 +50,13 @@ inline void MbcDevWrSERIALTX::run(MbcIo *io)
 //                              x  x  x  x  x  x  x  1    Rx IRQ on
 //
 // NOTE: The default value after a reset/power on is 0 (Rx IRQ off)
-class MbcDevWrRXIRQFLAG : public MbcDev
+class MbcDevWrRXIRQFLAGClass : public MbcDev
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrRXIRQFLAG::run(MbcIo *io)
+inline void MbcDevWrRXIRQFLAGClass::run(MbcIo *io)
 {
   if (io->getData() & (0x1 << MbcIo::IRQ_RX))
     io->setIrq(MbcIo::IRQ_RX);
@@ -70,15 +70,20 @@ inline void MbcDevWrRXIRQFLAG::run(MbcIo *io)
 //
 // NOTE: This opcode is intended to avoid delays in serial Tx operations, as the IOS hold the V20
 //       in a wait status if the TX buffer is full.
-class MbcDevRdATXBUFF : public MbcDev
+class MbcDevRdATXBUFFClass : public MbcDev
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdATXBUFF::run(MbcIo *io)
+inline void MbcDevRdATXBUFFClass::run(MbcIo *io)
 {
   io->setData(Serial.availableForWrite());
 }
+
+extern MbcDevRdSERIALRXClass MbcDevRdSERIALRX;
+extern MbcDevWrSERIALTXClass MbcDevWrSERIALTX;
+extern MbcDevWrRXIRQFLAGClass MbcDevWrRXIRQFLAG;
+extern MbcDevRdATXBUFFClass MbcDevRdATXBUFF;
 
 #endif // __INTERNAL__MBCDEVTTY_H__

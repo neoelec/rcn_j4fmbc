@@ -22,13 +22,13 @@ protected:
 //                            ---------------------------------------------------------
 //                              x  x  x  x  x  x  x  0    USER Led off
 //                              x  x  x  x  x  x  x  1    USER Led on
-class MbcDevWrUSERLED : public MbcDev, public MbcDevUser
+class MbcDevWrUSERLEDClass : public MbcDev, public MbcDevUser
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrUSERLED::run(MbcIo *io)
+inline void MbcDevWrUSERLEDClass::run(MbcIo *io)
 {
   const uint8_t io_data = io->getData();
 
@@ -43,15 +43,18 @@ inline void MbcDevWrUSERLED::run(MbcIo *io)
 //                            ---------------------------------------------------------
 //                              0  0  0  0  0  0  0  0    USER Key not pressed
 //                              0  0  0  0  0  0  0  1    USER Key pressed
-class MbcDevRdUSERKEY : public MbcDev, public MbcDevUser
+class MbcDevRdUSERKEYClass : public MbcDev, public MbcDevUser
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdUSERKEY::run(MbcIo *io)
+inline void MbcDevRdUSERKEYClass::run(MbcIo *io)
 {
   io->setData(user_->getKey());
 }
+
+extern MbcDevWrUSERLEDClass MbcDevWrUSERLED;
+extern MbcDevRdUSERKEYClass MbcDevRdUSERKEY;
 
 #endif // __INTERNAL__MBCDEVUSER_H__

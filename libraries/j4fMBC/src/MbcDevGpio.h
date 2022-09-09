@@ -22,13 +22,13 @@ protected:
 //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
 //                            ---------------------------------------------------------
 //                             D7 D6 D5 D4 D3 D2 D1 D0    GPIOA value (see MCP23017 datasheet)
-class MbcDevWrGPIOA : public MbcDev, public MbcDevGpio
+class MbcDevWrGPIOAClass : public MbcDev, public MbcDevGpio
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrGPIOA::run(MbcIo *io)
+inline void MbcDevWrGPIOAClass::run(MbcIo *io)
 {
   gpio_->writeGPIOA(io->getData());
 }
@@ -38,13 +38,13 @@ inline void MbcDevWrGPIOA::run(MbcIo *io)
 //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
 //                            ---------------------------------------------------------
 //                             D7 D6 D5 D4 D3 D2 D1 D0    GPIOB value (see MCP23017 datasheet)
-class MbcDevWrGPIOB : public MbcDev, public MbcDevGpio
+class MbcDevWrGPIOBClass : public MbcDev, public MbcDevGpio
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrGPIOB::run(MbcIo *io)
+inline void MbcDevWrGPIOBClass::run(MbcIo *io)
 {
   gpio_->writeGPIOB(io->getData());
 }
@@ -54,13 +54,13 @@ inline void MbcDevWrGPIOB::run(MbcIo *io)
 //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
 //                            ---------------------------------------------------------
 //                             D7 D6 D5 D4 D3 D2 D1 D0    IODIRA value (see MCP23017 datasheet)
-class MbcDevWrIODIRA : public MbcDev, public MbcDevGpio
+class MbcDevWrIODIRAClass : public MbcDev, public MbcDevGpio
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrIODIRA::run(MbcIo *io)
+inline void MbcDevWrIODIRAClass::run(MbcIo *io)
 {
   gpio_->writeIODIRA(io->getData());
 }
@@ -70,13 +70,13 @@ inline void MbcDevWrIODIRA::run(MbcIo *io)
 //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
 //                            ---------------------------------------------------------
 //                             D7 D6 D5 D4 D3 D2 D1 D0    IODIRB value (see MCP23017 datasheet)
-class MbcDevWrIODIRB : public MbcDev, public MbcDevGpio
+class MbcDevWrIODIRBClass : public MbcDev, public MbcDevGpio
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrIODIRB::run(MbcIo *io)
+inline void MbcDevWrIODIRBClass::run(MbcIo *io)
 {
   gpio_->writeIODIRB(io->getData());
 }
@@ -86,13 +86,13 @@ inline void MbcDevWrIODIRB::run(MbcIo *io)
 //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
 //                            ---------------------------------------------------------
 //                             D7 D6 D5 D4 D3 D2 D1 D0    GPPUA value (see MCP23017 datasheet)
-class MbcDevWrGPPUA : public MbcDev, public MbcDevGpio
+class MbcDevWrGPPUAClass : public MbcDev, public MbcDevGpio
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrGPPUA::run(MbcIo *io)
+inline void MbcDevWrGPPUAClass::run(MbcIo *io)
 {
   gpio_->writeGPPUA(io->getData());
 }
@@ -102,13 +102,13 @@ inline void MbcDevWrGPPUA::run(MbcIo *io)
 //                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
 //                            ---------------------------------------------------------
 //                             D7 D6 D5 D4 D3 D2 D1 D0    GPPUB value (see MCP23017 datasheet)
-class MbcDevWrGPPUB : public MbcDev, public MbcDevGpio
+class MbcDevWrGPPUBClass : public MbcDev, public MbcDevGpio
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrGPPUB::run(MbcIo *io)
+inline void MbcDevWrGPPUBClass::run(MbcIo *io)
 {
   gpio_->writeGPPUB(io->getData());
 }
@@ -120,13 +120,13 @@ inline void MbcDevWrGPPUB::run(MbcIo *io)
 //                             D7 D6 D5 D4 D3 D2 D1 D0    GPIOA value (see MCP23017 datasheet)
 //
 // NOTE: a value 0x00 is forced if the GPE Option is not present
-class MbcDevRdGPIOA : public MbcDev, public MbcDevGpio
+class MbcDevRdGPIOAClass : public MbcDev, public MbcDevGpio
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdGPIOA::run(MbcIo *io)
+inline void MbcDevRdGPIOAClass::run(MbcIo *io)
 {
   io->setData(gpio_->readGPIOA());
 }
@@ -138,15 +138,24 @@ inline void MbcDevRdGPIOA::run(MbcIo *io)
 //                             D7 D6 D5 D4 D3 D2 D1 D0    GPIOB value (see MCP23017 datasheet)
 //
 // NOTE: a value 0x00 is forced if the GPE Option is not present
-class MbcDevRdGPIOB : public MbcDev, public MbcDevGpio
+class MbcDevRdGPIOBClass : public MbcDev, public MbcDevGpio
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdGPIOB::run(MbcIo *io)
+inline void MbcDevRdGPIOBClass::run(MbcIo *io)
 {
   io->setData(gpio_->readGPIOB());
 }
+
+extern MbcDevWrGPIOAClass MbcDevWrGPIOA;
+extern MbcDevWrGPIOBClass MbcDevWrGPIOB;
+extern MbcDevWrIODIRAClass MbcDevWrIODIRA;
+extern MbcDevWrIODIRBClass MbcDevWrIODIRB;
+extern MbcDevWrGPPUAClass MbcDevWrGPPUA;
+extern MbcDevWrGPPUBClass MbcDevWrGPPUB;
+extern MbcDevRdGPIOAClass MbcDevRdGPIOA;
+extern MbcDevRdGPIOBClass MbcDevRdGPIOB;
 
 #endif /* __INTERNAL__MBCDEVGPIO_H__ */

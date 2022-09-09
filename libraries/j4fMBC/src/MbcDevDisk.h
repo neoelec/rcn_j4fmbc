@@ -47,13 +47,13 @@ protected:
 //         a maximum of 16 disks)
 // NOTE 2: Because SELDISK opens the "disk file" used for disk emulation, before using WRITESECT or READSECT
 //         a SELDISK must be performed at first.
-class MbcDevWrSELDISK : public MbcDev, public MbcDevDisk
+class MbcDevWrSELDISKClass : public MbcDev, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrSELDISK::run(MbcIo *io)
+inline void MbcDevWrSELDISKClass::run(MbcIo *io)
 {
   disk_->ioWrSELDISK(io);
 }
@@ -81,13 +81,13 @@ inline void MbcDevWrSELDISK::run(MbcIo *io)
 // NOTE 1: Allowed track numbers are in the range [0..511] (512 tracks)
 // NOTE 2: Before a WRITESECT or READSECT operation at least a SELSECT or a SELTRAK operation
 //         must be performed
-class MbcDevWrSELTRACK : public MbcDev, public MbcDevDisk
+class MbcDevWrSELTRACKClass : public MbcDev, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrSELTRACK::run(MbcIo *io)
+inline void MbcDevWrSELTRACKClass::run(MbcIo *io)
 {
   disk_->ioWrSELTRACK(io);
 }
@@ -111,13 +111,13 @@ inline void MbcDevWrSELTRACK::run(MbcIo *io)
 // NOTE 1: Allowed sector numbers are in the range [0..31] (32 sectors)
 // NOTE 2: Before a WRITESECT or READSECT operation at least a SELSECT or a SELTRAK operation
 //         must be performed
-class MbcDevWrSELSECT : public MbcDev, public MbcDevDisk
+class MbcDevWrSELSECTClass : public MbcDev, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrSELSECT::run(MbcIo *io)
+inline void MbcDevWrSELSECTClass::run(MbcIo *io)
 {
   disk_->ioWrSELSECT(io);
 }
@@ -151,13 +151,13 @@ inline void MbcDevWrSELSECT::run(MbcIo *io)
 // NOTE 2: Remember to open the right "disk file" at first using the SELDISK opcode
 // NOTE 3: The write finalization on SD "disk file" is executed only on the 512th data byte exchange, so be
 //         sure that exactly 512 data bytes are exchanged.
-class MbcDevWrWRITESECT : public MbcDev, public MbcDevDisk
+class MbcDevWrWRITESECTClass : public MbcDev, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevWrWRITESECT::run(MbcIo *io)
+inline void MbcDevWrWRITESECTClass::run(MbcIo *io)
 {
   disk_->ioWrWRITESECT(io);
 }
@@ -197,13 +197,13 @@ inline void MbcDevWrWRITESECT::run(MbcIo *io)
 // NOTE 2: Error codes from 0 to 6 come from the PetitFS library implementation
 // NOTE 3: ERRDISK must not be used to read the resulting error code after a SDMOUNT operation
 //         (see the SDMOUNT opcode)
-class MbcDevRdERRDISK : public MbcDev, public MbcDevDisk
+class MbcDevRdERRDISKClass : public MbcDev, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdERRDISK::run(MbcIo *io)
+inline void MbcDevRdERRDISKClass::run(MbcIo *io)
 {
   disk_->ioRdERRDISK(io);
 }
@@ -234,13 +234,13 @@ inline void MbcDevRdERRDISK::run(MbcIo *io)
 //
 // NOTE 1: Before a READSECT operation at least a SELTRACK or a SELSECT must be always performed
 // NOTE 2: Remember to open the right "disk file" at first using the SELDISK opcode
-class MbcDevRdREADSECT : public MbcDev, public MbcDevDisk
+class MbcDevRdREADSECTClass : public MbcDev, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdREADSECT::run(MbcIo *io)
+inline void MbcDevRdREADSECTClass::run(MbcIo *io)
 {
   disk_->ioRdREADSECT(io);
 }
@@ -259,15 +259,23 @@ inline void MbcDevRdREADSECT::run(MbcIo *io)
 // NOTE 2: For error codes explanation see ERRDISK opcode
 // NOTE 3: Only for this disk opcode, the resulting error is read as a data byte without using the
 //         ERRDISK opcode
-class MbcDevRdSDMOUNT : public MbcDev, public MbcDevDisk
+class MbcDevRdSDMOUNTClass : public MbcDev, public MbcDevDisk
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdSDMOUNT::run(MbcIo *io)
+inline void MbcDevRdSDMOUNTClass::run(MbcIo *io)
 {
   disk_->ioRdSDMOUNT(io);
 }
+
+extern MbcDevWrSELDISKClass MbcDevWrSELDISK;
+extern MbcDevWrSELTRACKClass MbcDevWrSELTRACK;
+extern MbcDevWrSELSECTClass MbcDevWrSELSECT;
+extern MbcDevWrWRITESECTClass MbcDevWrWRITESECT;
+extern MbcDevRdERRDISKClass MbcDevRdERRDISK;
+extern MbcDevRdREADSECTClass MbcDevRdREADSECT;
+extern MbcDevRdSDMOUNTClass MbcDevRdSDMOUNT;
 
 #endif // __INTERNAL__MBCDEVDISK_H__

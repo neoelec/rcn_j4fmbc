@@ -88,37 +88,6 @@ private:
   MbcDev *io_dev_wr_[MbcIo::WR_NR_CMD];
   MbcDev *io_dev_rd_[MbcIo::RD_NR_CMD];
 
-  MbcDevRdWrNOP rdwr_nop_;
-
-  MbcDevWrSELDISK wr_seldisk_;
-  MbcDevWrSELTRACK wr_seltrack_;
-  MbcDevWrSELSECT wr_selsect_;
-  MbcDevWrWRITESECT wr_writesect_;
-  MbcDevRdERRDISK rd_errdisk_;
-  MbcDevRdREADSECT rd_readsect_;
-  MbcDevRdSDMOUNT rd_sdmount_;
-
-  MbcDevWrGPIOA wr_gpioa_;
-  MbcDevWrGPIOB wr_gpiob_;
-  MbcDevWrIODIRA wr_iodira_;
-  MbcDevWrIODIRB wr_iodirb_;
-  MbcDevWrGPPUA wr_gppua_;
-  MbcDevWrGPPUB wr_gppub_;
-  MbcDevRdGPIOA rd_gpioa_;
-  MbcDevRdGPIOB rd_gpiob_;
-
-  MbcDevRdDATETIME rd_datetime_;
-
-  MbcDevRdSYSFLAGS rd_sysflags_;
-
-  MbcDevRdSERIALRX rd_serialrx_;
-  MbcDevWrSERIALTX wr_serialtx_;
-  MbcDevWrRXIRQFLAG wr_rxirqflag_;
-  MbcDevRdATXBUFF rd_atxbuff_;
-
-  MbcDevWrUSERLED wr_userled_;
-  MbcDevRdUSERKEY rd_userkey_;
-
   friend class __V20MbcIoState;
   friend class __V20MbcIoStateInit;
   friend class __V20MbcIoStateMenuEnter;

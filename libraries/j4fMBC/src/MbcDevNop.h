@@ -3,14 +3,16 @@
 
 #include "j4fMbc.h"
 
-class MbcDevRdWrNOP : public MbcDev
+class MbcDevRdWrNOPClass : public MbcDev
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdWrNOP::run(MbcIo *io)
+inline void MbcDevRdWrNOPClass::run(MbcIo *io)
 {
 }
+
+extern MbcDevRdWrNOPClass MbcDevRdWrNOP;
 
 #endif // __INTERNAL__MBCDEVNOP_H__

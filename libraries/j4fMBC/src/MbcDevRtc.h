@@ -31,13 +31,13 @@ protected:
 // NOTE 1: If RTC is not found all read values wil be = 0
 // NOTE 2: Overread data (more then 7 bytes read) will be = 0
 // NOTE 3: The temperature (Celsius) is a byte with two complement binary format [-128..127]
-class MbcDevRdDATETIME : public MbcDev, public MbcDevRtc
+class MbcDevRdDATETIMEClass : public MbcDev, public MbcDevRtc
 {
 public:
   inline void run(MbcIo *io);
 };
 
-inline void MbcDevRdDATETIME::run(MbcIo *io)
+inline void MbcDevRdDATETIMEClass::run(MbcIo *io)
 {
   const uint16_t io_count = io->getCount();
   uint8_t io_data;
@@ -74,5 +74,7 @@ inline void MbcDevRdDATETIME::run(MbcIo *io)
   io->setData(io_data);
   io->setCount(io_count + 1);
 }
+
+extern MbcDevRdDATETIMEClass MbcDevRdDATETIME;
 
 #endif // __INTERNAL__MBCDEVRTC_H__

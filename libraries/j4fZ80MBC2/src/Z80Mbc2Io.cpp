@@ -28,31 +28,31 @@ void Z80Mbc2IoClass::__beginIoDev(void)
 
   pin_ = dev_.getPin();
 
-  wr_seldisk_.begin(disk);
-  wr_seltrack_.begin(disk);
-  wr_selsect_.begin(disk);
-  wr_writesect_.begin(disk);
-  rd_errdisk_.begin(disk);
-  rd_readsect_.begin(disk);
-  rd_sdmount_.begin(disk);
+  MbcDevWrSELDISK.begin(disk);
+  MbcDevWrSELTRACK.begin(disk);
+  MbcDevWrSELSECT.begin(disk);
+  MbcDevWrWRITESECT.begin(disk);
+  MbcDevRdERRDISK.begin(disk);
+  MbcDevRdREADSECT.begin(disk);
+  MbcDevRdSDMOUNT.begin(disk);
 
-  wr_gpioa_.begin(gpio);
-  wr_gpiob_.begin(gpio);
-  wr_iodira_.begin(gpio);
-  wr_iodirb_.begin(gpio);
-  wr_gppua_.begin(gpio);
-  wr_gppub_.begin(gpio);
-  rd_gpioa_.begin(gpio);
-  rd_gpiob_.begin(gpio);
+  MbcDevWrGPIOA.begin(gpio);
+  MbcDevWrGPIOB.begin(gpio);
+  MbcDevWrIODIRA.begin(gpio);
+  MbcDevWrIODIRB.begin(gpio);
+  MbcDevWrGPPUA.begin(gpio);
+  MbcDevWrGPPUB.begin(gpio);
+  MbcDevRdGPIOA.begin(gpio);
+  MbcDevRdGPIOB.begin(gpio);
 
-  rd_datetime_.begin(rtc);
+  MbcDevRdDATETIME.begin(rtc);
 
-  wr_userled_.begin(user);
-  rd_userkey_.begin(user);
+  MbcDevWrUSERLED.begin(user);
+  MbcDevRdUSERKEY.begin(user);
 
-  wr_setbank_.begin(pin_);
+  MbcDevWrSETBANK.begin(pin_);
 
-  staticSysFlags_ |= rtc->isAvailable() << MbcDevRdSYSFLAGS::RTC;
+  staticSysFlags_ |= rtc->isAvailable() << MbcDevRdSYSFLAGSClass::RTC;
 }
 
 void Z80Mbc2IoClass::__initFromCfg(void)
@@ -61,7 +61,7 @@ void Z80Mbc2IoClass::__initFromCfg(void)
 
   cfg.begin(dev_.getSd());
 
-  staticSysFlags_ |= cfg.getAutoExecEn() << MbcDevRdSYSFLAGS::AUTOEXEC;
+  staticSysFlags_ |= cfg.getAutoExecEn() << MbcDevRdSYSFLAGSClass::AUTOEXEC;
   wait_count_ = 1 << cfg.getClkMode();
 
   irq_tty_rx_ = !!cfg.getIrqTtyRx();
@@ -74,24 +74,24 @@ void Z80Mbc2IoClass::__initIoDevWr(void)
   auto *gpio = dev_.getGpio();
 
   for (uint8_t command = MbcIo::WR_BEGIN; command <= MbcIo::WR_END; command++)
-    __setIoDevWr(command, &rdwr_nop_);
+    __setIoDevWr(command, &MbcDevRdWrNOP);
 
-  __setIoDevWr(MbcIo::WR_USERLED, &wr_userled_);
-  __setIoDevWr(MbcIo::WR_SERIALTX, &wr_serialtx_);
-  __setIoDevWr(MbcIo::WR_SELDISK, &wr_seldisk_);
-  __setIoDevWr(MbcIo::WR_SELTRACK, &wr_seltrack_);
-  __setIoDevWr(MbcIo::WR_SELSECT, &wr_selsect_);
-  __setIoDevWr(MbcIo::WR_WRITESECT, &wr_writesect_);
-  __setIoDevWr(MbcIo::WR_SETBANK, &wr_setbank_);
+  __setIoDevWr(MbcIo::WR_USERLED, &MbcDevWrUSERLED);
+  __setIoDevWr(MbcIo::WR_SERIALTX, &MbcDevWrSERIALTX);
+  __setIoDevWr(MbcIo::WR_SELDISK, &MbcDevWrSELDISK);
+  __setIoDevWr(MbcIo::WR_SELTRACK, &MbcDevWrSELTRACK);
+  __setIoDevWr(MbcIo::WR_SELSECT, &MbcDevWrSELSECT);
+  __setIoDevWr(MbcIo::WR_WRITESECT, &MbcDevWrWRITESECT);
+  __setIoDevWr(MbcIo::WR_SETBANK, &MbcDevWrSETBANK);
 
   if (gpio->isAvailable())
   {
-    __setIoDevWr(MbcIo::WR_GPIOA, &wr_gpioa_);
-    __setIoDevWr(MbcIo::WR_GPIOB, &wr_gpiob_);
-    __setIoDevWr(MbcIo::WR_IODIRA, &wr_iodira_);
-    __setIoDevWr(MbcIo::WR_IODIRB, &wr_iodirb_);
-    __setIoDevWr(MbcIo::WR_GPPUA, &wr_gppua_);
-    __setIoDevWr(MbcIo::WR_GPPUB, &wr_gppub_);
+    __setIoDevWr(MbcIo::WR_GPIOA, &MbcDevWrGPIOA);
+    __setIoDevWr(MbcIo::WR_GPIOB, &MbcDevWrGPIOB);
+    __setIoDevWr(MbcIo::WR_IODIRA, &MbcDevWrIODIRA);
+    __setIoDevWr(MbcIo::WR_IODIRB, &MbcDevWrIODIRB);
+    __setIoDevWr(MbcIo::WR_GPPUA, &MbcDevWrGPPUA);
+    __setIoDevWr(MbcIo::WR_GPPUB, &MbcDevWrGPPUB);
   }
 }
 
@@ -105,19 +105,19 @@ void Z80Mbc2IoClass::__initIoDevRd(void)
   auto *gpio = dev_.getGpio();
 
   for (uint8_t command = MbcIo::RD_BEGIN; command <= MbcIo::RD_END; command++)
-    __setIoDevRd(command, &rdwr_nop_);
+    __setIoDevRd(command, &MbcDevRdWrNOP);
 
-  __setIoDevRd(MbcIo::RD_USERKEY, &rd_userkey_);
-  __setIoDevRd(MbcIo::RD_SYSFLAGS, &rd_sysflags_);
-  __setIoDevRd(MbcIo::RD_DATETIME, &rd_datetime_);
-  __setIoDevRd(MbcIo::RD_ERRDISK, &rd_errdisk_);
-  __setIoDevRd(MbcIo::RD_READSECT, &rd_readsect_);
-  __setIoDevRd(MbcIo::RD_SDMOUNT, &rd_sdmount_);
+  __setIoDevRd(MbcIo::RD_USERKEY, &MbcDevRdUSERKEY);
+  __setIoDevRd(MbcIo::RD_SYSFLAGS, &MbcDevRdSYSFLAGS);
+  __setIoDevRd(MbcIo::RD_DATETIME, &MbcDevRdDATETIME);
+  __setIoDevRd(MbcIo::RD_ERRDISK, &MbcDevRdERRDISK);
+  __setIoDevRd(MbcIo::RD_READSECT, &MbcDevRdREADSECT);
+  __setIoDevRd(MbcIo::RD_SDMOUNT, &MbcDevRdSDMOUNT);
 
   if (gpio->isAvailable())
   {
-    __setIoDevRd(MbcIo::RD_GPIOA, &rd_gpioa_);
-    __setIoDevRd(MbcIo::RD_GPIOB, &rd_gpiob_);
+    __setIoDevRd(MbcIo::RD_GPIOA, &MbcDevRdGPIOA);
+    __setIoDevRd(MbcIo::RD_GPIOB, &MbcDevRdGPIOB);
   }
 }
 
@@ -141,7 +141,7 @@ inline void Z80Mbc2IoClass::runIo(void)
 
 uint8_t Z80Mbc2IoClass::getSysFlag(void)
 {
-  return staticSysFlags_ | ((!!last_rx_is_empty_) << MbcDevRdSYSFLAGS::PREV_RX);
+  return staticSysFlags_ | ((!!last_rx_is_empty_) << MbcDevRdSYSFLAGSClass::PREV_RX);
 }
 
 inline void Z80Mbc2IoClass::__runWrite(void)

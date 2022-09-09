@@ -3,7 +3,7 @@
 
 #include "j4fMbc.h"
 
-class MbcDevRdSYSFLAGS : public MbcDev
+class MbcDevRdSYSFLAGSClass : public MbcDev
 {
 public:
   enum {
@@ -29,7 +29,7 @@ public:
 //                              X  X  X  X  1  X  X  X    Previous RX char was a "buffer empty" flag
 //
 // NOTE: Currently only D0-D3 are used
-inline void MbcDevRdSYSFLAGS::run(MbcIo *io)
+inline void MbcDevRdSYSFLAGSClass::run(MbcIo *io)
 {
   uint8_t io_data = io->getSysFlag();
 
@@ -37,5 +37,7 @@ inline void MbcDevRdSYSFLAGS::run(MbcIo *io)
 
   io->setData(io_data);
 }
+
+extern MbcDevRdSYSFLAGSClass MbcDevRdSYSFLAGS;
 
 #endif // __MBCDEVSYSFLAGS_H__
