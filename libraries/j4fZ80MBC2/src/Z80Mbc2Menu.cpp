@@ -113,7 +113,7 @@ void Z80Mbc2MenuClass::doCmdToggleAutoexecEn(void)
 void Z80Mbc2MenuClass::doCmdChangeClockMode(void)
 {
   String str_idx;
-  const long clock_mode_max = CLOCK_MODE_MAX;
+  const long clock_mode_max = Z80Mbc2Cfg::CLOCK_MODE_MAX;
   long clock_mode = cfg_.getClkMode();
 
   Serial.println();

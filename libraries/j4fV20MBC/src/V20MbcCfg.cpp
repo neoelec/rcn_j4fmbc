@@ -7,6 +7,8 @@
 #define SZ_BUF 32
 #define SZ_CSV_BUF (SZ_BUF * 3)
 
+#define BOOT_MODE_MAX 100
+
 #define IDX_BOOT_MODE 10
 #define IDX_AUTOEXEC_EN 12
 #define IDX_CLOCK_MODE 13

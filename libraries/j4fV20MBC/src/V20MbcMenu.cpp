@@ -113,7 +113,7 @@ void V20MbcMenuClass::doCmdToggleAutoexecEn(void)
 void V20MbcMenuClass::doCmdChangeClockMode(void)
 {
   String str_idx;
-  const long clock_mode_max = CLOCK_MODE_MAX;
+  const long clock_mode_max = V20MbcCfg::CLOCK_MODE_MAX;
   long clock_mode = cfg_.getClkMode();
 
   Serial.println();

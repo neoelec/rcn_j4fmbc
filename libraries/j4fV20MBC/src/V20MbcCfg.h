@@ -4,12 +4,14 @@
 #include <j4fDev.h>
 #include <stdint.h>
 
-#define BOOT_MODE_MAX 100
-#define CLOCK_MODE_MAX 1
-
 class V20MbcCfg
 {
 public:
+  enum
+  {
+    CLOCK_MODE_MAX = 1
+  };
+
   bool begin(DevSd *sd, const char *csv_name);
   bool begin(DevSd *sd, uint8_t boot_mode);
   bool begin(DevSd *sd);
