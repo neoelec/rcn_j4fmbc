@@ -4,12 +4,12 @@
 
 #include "j4fZ80Mbc2.h"
 
-void Z80Mbc2Loader::begin(Z80Mbc2Dev &dev)
+void Z80Mbc2Loader::begin(Z80Mbc2Dev &dev, Z80Mbc2Pin *pin)
 {
   clock_ = dev.getClock();
   sd_ = dev.getSd();
   disk_ = dev.getDisk();
-  pin_ = dev.getPin();
+  pin_ = pin;
 }
 
 void Z80Mbc2Loader::bootstrap(void)

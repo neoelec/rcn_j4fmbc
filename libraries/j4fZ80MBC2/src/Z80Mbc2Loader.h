@@ -10,7 +10,7 @@
 class Z80Mbc2Loader
 {
 public:
-  void begin(Z80Mbc2Dev &dev);
+  void begin(Z80Mbc2Dev &dev, Z80Mbc2Pin *pin);
   void bootstrap(void);
 
 private:

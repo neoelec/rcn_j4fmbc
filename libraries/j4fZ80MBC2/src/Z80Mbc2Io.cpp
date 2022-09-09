@@ -26,7 +26,7 @@ void Z80Mbc2IoClass::__beginIoDev(void)
   auto *disk = dev_.getDisk();
   auto *rtc = dev_.getRtc();
 
-  pin_ = dev_.getPin();
+  pin_.begin();
 
   MbcDevWrSELDISK.begin(disk);
   MbcDevWrSELTRACK.begin(disk);
@@ -50,7 +50,7 @@ void Z80Mbc2IoClass::__beginIoDev(void)
   MbcDevWrUSERLED.begin(user);
   MbcDevRdUSERKEY.begin(user);
 
-  MbcDevWrSETBANK.begin(pin_);
+  MbcDevWrSETBANK.begin(&pin_);
 
   staticSysFlags_ |= rtc->isAvailable() << MbcDevRdSYSFLAGSClass::RTC;
 }
@@ -128,11 +128,11 @@ void Z80Mbc2IoClass::__setIoDevRd(uint8_t command, MbcDev *dev)
 
 inline void Z80Mbc2IoClass::runIo(void)
 {
-  if (!pin_->getPIN_nWAIT())
+  if (!pin_.getPIN_nWAIT())
   {
-    if (!pin_->getPIN_nWR())
+    if (!pin_.getPIN_nWR())
       __runWrite();
-    else if (!pin_->getPIN_nRD())
+    else if (!pin_.getPIN_nRD())
       __runRead();
     else
       __runInterrupt();
@@ -146,8 +146,8 @@ uint8_t Z80Mbc2IoClass::getSysFlag(void)
 
 inline void Z80Mbc2IoClass::__runWrite(void)
 {
-  _setAddress(pin_->getPIN_AD0());
-  setData(pin_->getPORT_DATA());
+  _setAddress(pin_.getPIN_AD0());
+  setData(pin_.getPORT_DATA());
 
   if (getAddress())
   {
@@ -158,16 +158,16 @@ inline void Z80Mbc2IoClass::__runWrite(void)
     __execWriteCommand();
 
   // Control bus sequence to exit from a wait state (M I/O write cycle)
-  pin_->setPIN_nBUSREQ_LOW();     // Request for a DMA
-  pin_->setPIN_WAIT_nRES_LOW();   // Reset WAIT FF exiting from WAIT state
+  pin_.setPIN_nBUSREQ_LOW();     // Request for a DMA
+  pin_.setPIN_WAIT_nRES_LOW();   // Reset WAIT FF exiting from WAIT state
   delayMicroseconds(wait_count_); //
-  pin_->setPIN_WAIT_nRES_HIGH();  // Now Z80 is in DMA, so it's safe set WAIT_RES_ HIGH again
-  pin_->setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
+  pin_.setPIN_WAIT_nRES_HIGH();  // Now Z80 is in DMA, so it's safe set WAIT_RES_ HIGH again
+  pin_.setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
 }
 
 inline void Z80Mbc2IoClass::__runRead(void)
 {
-  _setAddress(pin_->getPIN_AD0());
+  _setAddress(pin_.getPIN_AD0());
   setData(0);
 
   if (getAddress())
@@ -181,32 +181,32 @@ inline void Z80Mbc2IoClass::__runRead(void)
     else
       last_rx_is_empty_ = 1;
 
-    pin_->setPIN_nINT_HIGH();
+    pin_.setPIN_nINT_HIGH();
   }
   else
     __execReadCommand();
 
-  pin_->setPORT_DATA(getData()); // Configure Z80 data bus D0-D7 (PA0-PA7) as output
+  pin_.setPORT_DATA(getData()); // Configure Z80 data bus D0-D7 (PA0-PA7) as output
                                  // Current output on data bus
 
   // Control bus sequence to exit from a wait state (M I/O read cycle)
-  pin_->setPIN_nBUSREQ_LOW();     // Request for a DMA
-  pin_->setPIN_WAIT_nRES_LOW();   // Now is safe reset WAIT FF (exiting from WAIT state)
+  pin_.setPIN_nBUSREQ_LOW();     // Request for a DMA
+  pin_.setPIN_WAIT_nRES_LOW();   // Now is safe reset WAIT FF (exiting from WAIT state)
   delayMicroseconds(wait_count_); // Wait 2us just to be sure that Z80 read the data and go HiZ
   delayMicroseconds(wait_count_); //
-  pin_->releasePORT_DATA();       // Configure Z80 data bus D0-D7 (PA0-PA7) as input with pull-up
-  pin_->setPIN_WAIT_nRES_HIGH();  // Now Z80 is in DMA (HiZ), so it's safe set WAIT_RES_ HIGH again
-  pin_->setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
+  pin_.releasePORT_DATA();       // Configure Z80 data bus D0-D7 (PA0-PA7) as input with pull-up
+  pin_.setPIN_WAIT_nRES_HIGH();  // Now Z80 is in DMA (HiZ), so it's safe set WAIT_RES_ HIGH again
+  pin_.setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
 }
 
 inline void Z80Mbc2IoClass::__runInterrupt(void)
 {
   // Control bus sequence to exit from a wait state (M interrupt cycle)
-  pin_->setPIN_nBUSREQ_LOW();     // Request for a DMA
-  pin_->setPIN_WAIT_nRES_LOW();   // Reset WAIT FF exiting from WAIT state
+  pin_.setPIN_nBUSREQ_LOW();     // Request for a DMA
+  pin_.setPIN_WAIT_nRES_LOW();   // Reset WAIT FF exiting from WAIT state
   delayMicroseconds(wait_count_); //
-  pin_->setPIN_WAIT_nRES_HIGH();  // Now Z80 is in DMA, so it's safe set WAIT_RES_ HIGH again
-  pin_->setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
+  pin_.setPIN_WAIT_nRES_HIGH();  // Now Z80 is in DMA, so it's safe set WAIT_RES_ HIGH again
+  pin_.setPIN_nBUSREQ_HIGH();    // Resume Z80 from DMA
 }
 
 inline void Z80Mbc2IoClass::__execWriteCommand(void)
@@ -268,8 +268,9 @@ void __Z80Mbc2IoStateBootstrap::handle(Z80Mbc2IoClass *io)
 {
   Z80Mbc2Dev &dev = io->dev_;
   Z80Mbc2Loader &loader = io->loader_;
+  Z80Mbc2Pin *pin = &io->pin_;
 
-  loader.begin(dev);
+  loader.begin(dev, pin);
   loader.bootstrap();
 
   io->state_ = &io->st_run_;

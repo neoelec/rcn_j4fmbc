@@ -4,8 +4,6 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "Z80Mbc2Pin.h"
-
 class __Z80Mbc2DevMcuVariant
 {
 public:
@@ -29,7 +27,6 @@ public:
   DevTty *getTty(void);
   DevUser *getUser(void);
   MbcDisk *getDisk(void);
-  Z80Mbc2Pin *getPin(void);
 
 private:
   DevGpio gpio_;
@@ -38,7 +35,6 @@ private:
   DevTty tty_;
   DevUser user_;
   MbcDisk disk_;
-  Z80Mbc2Pin pin_;
 };
 
 #endif // __INTERNAL__Z80MBC2DEV_H__

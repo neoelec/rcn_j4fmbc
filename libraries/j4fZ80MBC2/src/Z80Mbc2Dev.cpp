@@ -27,8 +27,6 @@ void Z80Mbc2Dev::begin(void)
   user_.begin(PIN_USER);
 
   disk_.begin(&sd_);
-
-  pin_.begin();
 }
 
 DevGpio *Z80Mbc2Dev::getGpio(void)
@@ -59,9 +57,4 @@ DevUser *Z80Mbc2Dev::getUser(void)
 MbcDisk *Z80Mbc2Dev::getDisk(void)
 {
   return &disk_;
-}
-
-Z80Mbc2Pin *Z80Mbc2Dev::getPin(void)
-{
-  return &pin_;
 }

@@ -72,8 +72,7 @@ private:
 private:
   Z80Mbc2Dev dev_;
   Z80Mbc2Loader loader_;
-
-  Z80Mbc2Pin *pin_;
+  Z80Mbc2Pin pin_;
   uint8_t staticSysFlags_;
   uint8_t wait_count_;
   uint8_t last_rx_is_empty_;
@@ -109,7 +108,7 @@ inline void Z80Mbc2IoClass::run(void)
 inline void Z80Mbc2IoClass::serialEvent(void)
 {
   if (irq_tty_rx_ && Serial.available())
-    pin_->setPIN_nINT_LOW();
+    pin_.setPIN_nINT_LOW();
 }
 
 #endif // __INTERNAL__Z80MBC2BUS_H__
