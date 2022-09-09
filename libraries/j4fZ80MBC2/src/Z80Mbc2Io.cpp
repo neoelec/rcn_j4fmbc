@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#pragma GCC optimize("O2")
-
 #include "j4fZ80Mbc2.h"
 
 Z80Mbc2IoClass Z80Mbc2Io;

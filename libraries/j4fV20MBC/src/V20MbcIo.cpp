@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 
-#pragma GCC optimize("O2")
-
 #include "j4fV20Mbc.h"
 
 V20MbcIoClass V20MbcIo;
