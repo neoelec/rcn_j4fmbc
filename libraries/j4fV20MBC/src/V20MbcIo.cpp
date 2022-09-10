@@ -44,21 +44,26 @@ void V20MbcIoClass::__beginIoDev(void)
   MbcDevRdREADSECT.begin(disk);
   MbcDevRdSDMOUNT.begin(disk);
 
-  MbcDevWrGPIOA.begin(gpio);
-  MbcDevWrGPIOB.begin(gpio);
-  MbcDevWrIODIRA.begin(gpio);
-  MbcDevWrIODIRB.begin(gpio);
-  MbcDevWrGPPUA.begin(gpio);
-  MbcDevWrGPPUB.begin(gpio);
-  MbcDevRdGPIOA.begin(gpio);
-  MbcDevRdGPIOB.begin(gpio);
-
-  MbcDevRdDATETIME.begin(rtc);
-
   MbcDevWrUSERLED.begin(user);
   MbcDevRdUSERKEY.begin(user);
 
-  staticSysFlags_ |= rtc->isAvailable() << MbcDevRdSYSFLAGSClass::RTC;
+  if (gpio->isAvailable())
+  {
+    MbcDevWrGPIOA.begin(gpio);
+    MbcDevWrGPIOB.begin(gpio);
+    MbcDevWrIODIRA.begin(gpio);
+    MbcDevWrIODIRB.begin(gpio);
+    MbcDevWrGPPUA.begin(gpio);
+    MbcDevWrGPPUB.begin(gpio);
+    MbcDevRdGPIOA.begin(gpio);
+    MbcDevRdGPIOB.begin(gpio);
+  }
+
+  if (rtc->isAvailable())
+  {
+    MbcDevRdDATETIME.begin(rtc);
+    staticSysFlags_ |= 1 << MbcDevRdSYSFLAGSClass::RTC;
+  }
 }
 
 void V20MbcIoClass::__initFromCfg(void)
@@ -178,10 +183,10 @@ inline void V20MbcIoClass::__runWrite(void)
   pin_.setPIN_nRDYRES_HIGH(); // RDYRES_ = HIGH
 
   // Time critical section!!!
-  noInterrupts();               // !!! Start of a time critical section. No interrupt allowed
+  noInterrupts();              // !!! Start of a time critical section. No interrupt allowed
   pin_.setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
   pin_.setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
-  interrupts();                 // !!! End of a time critical section. Interrupt resumed
+  interrupts();                // !!! End of a time critical section. Interrupt resumed
 }
 
 inline void V20MbcIoClass::__runRead(void)
@@ -212,16 +217,16 @@ inline void V20MbcIoClass::__runRead(void)
   pin_.setPORT_DATA(getData());
 
   // Control bus sequence to exit from a wait state (M I/O read cycle)
-  pin_.setPIN_nRDYRES_LOW();     // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
+  pin_.setPIN_nRDYRES_LOW();      // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
   delayMicroseconds(wait_count_); // Wait 2us just to be sure that the V20 reads the data and goes HiZ
-  pin_.releasePORT_DATA();       //
-  pin_.setPIN_nRDYRES_HIGH();    // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
+  pin_.releasePORT_DATA();        //
+  pin_.setPIN_nRDYRES_HIGH();     // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
 
   // Time critical section!!!
-  noInterrupts();               // !!! Start of a time critical section. No interrupt allowed
+  noInterrupts();              // !!! Start of a time critical section. No interrupt allowed
   pin_.setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
   pin_.setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
-  interrupts();                 // !!! End of a time critical section. Interrupt resumed
+  interrupts();                // !!! End of a time critical section. Interrupt resumed
 }
 
 inline void V20MbcIoClass::__runInterrupt(void)
@@ -234,17 +239,17 @@ inline void V20MbcIoClass::__runInterrupt(void)
   pin_.setPORT_DATA(getData());
 
   // Control bus sequence to exit from a wait state (Interrupt)
-  pin_.setPIN_nRDYRES_LOW();     // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
+  pin_.setPIN_nRDYRES_LOW();      // RDYRES_ = LOW: Now is safe reset WAIT FF (exiting from WAIT state)
   delayMicroseconds(wait_count_); // Wait 2us (8 bus cycles @ 4MHz) just to be sure to execute both
   delayMicroseconds(wait_count_); //  the two INTA bus cycles
-  pin_.releasePORT_DATA();       //
-  pin_.setPIN_nRDYRES_HIGH();    // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
+  pin_.releasePORT_DATA();        //
+  pin_.setPIN_nRDYRES_HIGH();     // RDYRES_ = HIGH: Now V20 in HiZ (HOLD), so it's safe deactivate RDYRES_
 
   // Time critical section!!!
-  noInterrupts();               // !!! Start of a time critical section. No interrupt allowed
+  noInterrupts();              // !!! Start of a time critical section. No interrupt allowed
   pin_.setPIN_nHOLDRES_LOW();  // !!! HOLDRES_ = LOW: Resume V20 from HiZ (reset HOLD FF)
   pin_.setPIN_nHOLDRES_HIGH(); // !!! HOLDRES_ = HIGH
-  interrupts();                 // !!! End of a time critical section. Interrupt resumed
+  interrupts();                // !!! End of a time critical section. Interrupt resumed
 }
 
 inline void V20MbcIoClass::__runHalt(void)
