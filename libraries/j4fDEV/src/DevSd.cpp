@@ -115,23 +115,8 @@ void DevSd::__printOperation(uint8_t operation)
 
 void DevSd::waitKey(void)
 {
-  __flushTtyRx();
-
   Serial.println(F("IOS: Check SD and press a key to repeat"));
   Serial.println();
 
-  __waitTtyRx();
-  __flushTtyRx();
-}
-
-void DevSd::__flushTtyRx(void)
-{
-  while (Serial.available() > 0)
-    Serial.read();
-}
-
-void DevSd::__waitTtyRx(void)
-{
-  while (Serial.available() < 1)
-    ;
+  DevTty::waitKey();
 }

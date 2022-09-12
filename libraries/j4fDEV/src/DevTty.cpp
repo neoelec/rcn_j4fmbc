@@ -14,6 +14,18 @@ void DevTty::begin(uint8_t pin_rts, uint8_t pin_cts)
     Serial.println(F("IOS: Found extended serial Rx buffer"));
 }
 
+void DevTty::waitKey(void)
+{
+  while (Serial.available() > 0)
+    Serial.read();
+
+  while (Serial.available() < 1)
+    ;
+
+  while (Serial.available() > 0)
+    Serial.read();
+}
+
 void DevTty::__resetUterm(uint8_t pin_rts, uint8_t pin_cts)
 {
   pinMode(pin_cts, INPUT_PULLUP);

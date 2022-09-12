@@ -27,8 +27,6 @@ public:
 private:
   void __printErrorCode(FRESULT error);
   void __printOperation(uint8_t operation);
-  void __flushTtyRx(void);
-  void __waitTtyRx(void);
 
   FATFS fatfs_;
 };
