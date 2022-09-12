@@ -28,7 +28,7 @@ uint8_t DevSd::mount(void)
 
   error = PFF3a.begin(&fatfs_, PIN_nSS);
 
-  return static_cast<uint8_t>(error & 0xFF);
+  return static_cast<uint8_t>(error);
 }
 
 uint8_t DevSd::open(const char *file_name)
@@ -37,7 +37,7 @@ uint8_t DevSd::open(const char *file_name)
 
   error = PFF3a.open(file_name);
 
-  return static_cast<uint8_t>(error & 0xFF);
+  return static_cast<uint8_t>(error);
 }
 
 void DevSd::printError(uint8_t error, uint8_t operation, const char *file_name)

@@ -153,7 +153,7 @@ void V20MbcCfg::__parseToken(char *token, uint8_t i)
     break;
   case 1: // mode_80_
     tmp = strtol(token, NULL, 10);
-    mode_80_ = static_cast<int8_t>(tmp & 0xFF);
+    mode_80_ = static_cast<int8_t>(tmp);
     break;
   case 2: // boot_file
     strncpy(boot_file_, token, sizeof(boot_file_));
@@ -164,31 +164,31 @@ void V20MbcCfg::__parseToken(char *token, uint8_t i)
     break;
   case 3: // load_segment_
     tmp = strtol(token, NULL, 16);
-    load_segment_ = static_cast<uint16_t>(tmp & 0xFFFF);
+    load_segment_ = static_cast<uint16_t>(tmp);
     break;
   case 4: // load_offset_
     tmp = strtol(token, NULL, 16);
-    load_offset_ = static_cast<uint16_t>(tmp & 0xFFFF);
+    load_offset_ = static_cast<uint16_t>(tmp);
     break;
   case 5: // boot_segment_
     tmp = strtol(token, NULL, 16);
-    boot_segment_ = static_cast<uint16_t>(tmp & 0xFFFF);
+    boot_segment_ = static_cast<uint16_t>(tmp);
     break;
   case 6: // boot_offset_
     tmp = strtol(token, NULL, 16);
-    boot_offset_ = static_cast<uint16_t>(tmp & 0xFFFF);
+    boot_offset_ = static_cast<uint16_t>(tmp);
     break;
   case 7: // ptr_boot_offset_
     tmp = strtol(token, NULL, 16);
-    ptr_boot_offset_ = static_cast<uint16_t>(tmp & 0xFFFF);
+    ptr_boot_offset_ = static_cast<uint16_t>(tmp);
     break;
   case 8: // ptr_boot_size_
     tmp = strtol(token, NULL, 16);
-    ptr_boot_size_ = static_cast<uint16_t>(tmp & 0xFFFF);
+    ptr_boot_size_ = static_cast<uint16_t>(tmp);
     break;
   case 9: // disk_set_
     tmp = strtol(token, NULL, 10);
-    disk_set_ = static_cast<int8_t>(tmp & 0xFF);
+    disk_set_ = static_cast<int8_t>(tmp);
     break;
   }
 }

@@ -160,19 +160,19 @@ void Z80Mbc2Cfg::__parseToken(char *token, uint8_t i)
     break;
   case 2: // load_address_
     tmp = strtol(token, NULL, 16);
-    load_address_ = static_cast<uint16_t>(tmp & 0xFFFF);
+    load_address_ = static_cast<uint16_t>(tmp);
     break;
   case 3: // boot_address_
     tmp = strtol(token, NULL, 16);
-    boot_address_ = static_cast<uint16_t>(tmp & 0xFFFF);
+    boot_address_ = static_cast<uint16_t>(tmp);
     break;
   case 4: // disk_set_
     tmp = strtol(token, NULL, 10);
-    disk_set_ = static_cast<int8_t>(tmp & 0xFF);
+    disk_set_ = static_cast<int8_t>(tmp);
     break;
   case 5: // irq_tty_rx_
     tmp = strtol(token, NULL, 10);
-    irq_tty_rx_ = static_cast<uint8_t>(tmp & 0xFF);
+    irq_tty_rx_ = static_cast<uint8_t>(tmp);
     break;
   }
 }

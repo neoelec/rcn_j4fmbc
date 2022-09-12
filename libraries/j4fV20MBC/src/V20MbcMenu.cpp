@@ -72,7 +72,7 @@ void V20MbcMenuClass::doChangeBootMode(void)
   }
 
 __exit:
-  cfg_.setBootMode(static_cast<uint8_t>(boot_mode & 0xFF));
+  cfg_.setBootMode(static_cast<uint8_t>(boot_mode));
   Serial.println();
   cfg_.printCfg();
   Serial.println();
@@ -122,7 +122,7 @@ void V20MbcMenuClass::doCmdChangeClockMode(void)
   {
     Serial.println();
     Serial.printf(F("%2ld - "), i);
-    cfg_.printClk(static_cast<uint8_t>(i & 0xFF));
+    cfg_.printClk(static_cast<uint8_t>(i));
   }
 
   if (!menu_cmd_.getStrValue(str_idx) || !str_idx.length())
@@ -136,9 +136,9 @@ void V20MbcMenuClass::doCmdChangeClockMode(void)
 __exit:
   Serial.println();
   Serial.printf(F("IOS: C> "));
-  cfg_.printClk(static_cast<uint8_t>(clock_mode & 0xFF));
+  cfg_.printClk(static_cast<uint8_t>(clock_mode));
   Serial.println();
-  cfg_.setClkMode(static_cast<uint8_t>(clock_mode & 0xFF));
+  cfg_.setClkMode(static_cast<uint8_t>(clock_mode));
   menu_cmd_.giveCmdPrompt();
 }
 
