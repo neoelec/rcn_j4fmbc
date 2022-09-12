@@ -265,7 +265,7 @@ void V20MbcMenuClass::__initializeMenuCmd(void)
   static tMenuCmdTxt txt_a[] PROGMEM = "a - Toggle AUTOEXEC";
   static tMenuCmdTxt txt_c[] PROGMEM = "c - Select CLK Mode";
   static tMenuCmdTxt txt_t[] PROGMEM = "t - Adjust RTC";
-  static tMenuCmdTxt txt_y[] PROGMEM = "y - Change Menu";
+  static tMenuCmdTxt txt_y[] PROGMEM = "y - Change Board Type";
   static tMenuCmdTxt txt_x[] PROGMEM = "x - Exit";
   static tMenuCmdTxt txt__[] PROGMEM = "? - Help";
   static stMenuCmd menu_list[] = {
@@ -281,8 +281,10 @@ void V20MbcMenuClass::__initializeMenuCmd(void)
        { V20MbcMenu.doCmdChangeClockMode(); }},
       {txt_t, 't', []()
        { V20MbcMenu.doCmdAdjustRtc(); }},
+#if defined(ARDUINO_AVR_ATmega1284)
       {txt_y, 'y', []()
        { V20MbcMenu.doCmdChangeBoardType(); }},
+#endif
       {txt_x, 'x', []()
        { V20MbcMenu.doCmdExit(); }},
       {txt__, '?', []()

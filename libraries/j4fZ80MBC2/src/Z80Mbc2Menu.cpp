@@ -265,7 +265,7 @@ void Z80Mbc2MenuClass::__initializeMenuCmd(void)
   static tMenuCmdTxt txt_a[] PROGMEM = "a - Toggle AUTOEXEC";
   static tMenuCmdTxt txt_c[] PROGMEM = "c - Select CLK Mode";
   static tMenuCmdTxt txt_t[] PROGMEM = "t - Adjust RTC";
-  static tMenuCmdTxt txt_y[] PROGMEM = "y - Change Menu";
+  static tMenuCmdTxt txt_y[] PROGMEM = "y - Change Board Type";
   static tMenuCmdTxt txt_x[] PROGMEM = "x - Exit";
   static tMenuCmdTxt txt__[] PROGMEM = "? - Help";
   static stMenuCmd menu_list[] = {
@@ -281,8 +281,10 @@ void Z80Mbc2MenuClass::__initializeMenuCmd(void)
        { Z80Mbc2Menu.doCmdChangeClockMode(); }},
       {txt_t, 't', []()
        { Z80Mbc2Menu.doCmdAdjustRtc(); }},
+#if defined(ARDUINO_AVR_ATmega1284)
       {txt_y, 'y', []()
        { Z80Mbc2Menu.doCmdChangeBoardType(); }},
+#endif
       {txt_x, 'x', []()
        { Z80Mbc2Menu.doCmdExit(); }},
       {txt__, '?', []()
