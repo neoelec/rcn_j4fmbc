@@ -1,7 +1,7 @@
 #ifndef __INTERNAL__MBCDEVIO_H__
 #define __INTERNAL__MBCDEVIO_H__
 
-class MbcIo;
+#include "MbcIo.h"
 
 class MbcDevIo
 {

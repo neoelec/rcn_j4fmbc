@@ -1,7 +1,7 @@
 #ifndef __MBCDEVSYSFLAGS_H__
 #define __MBCDEVSYSFLAGS_H__
 
-#include "j4fMbc.h"
+#include "MbcDevIo.h"
 
 class MbcDevRdSYSFLAGSClass : public MbcDevIo
 {

@@ -3,8 +3,6 @@
 
 #include <stdint.h>
 
-class MbcDevIo;
-
 class MbcIo
 {
 public:

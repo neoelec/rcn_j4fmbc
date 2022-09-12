@@ -1,7 +1,7 @@
 #ifndef __INTERNAL__MBCDEVNOP_H__
 #define __INTERNAL__MBCDEVNOP_H__
 
-#include "j4fMbc.h"
+#include "MbcDevIo.h"
 
 class MbcDevRdWrNOPClass : public MbcDevIo
 {
