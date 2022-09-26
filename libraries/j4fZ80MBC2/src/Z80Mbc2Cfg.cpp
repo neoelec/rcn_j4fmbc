@@ -68,7 +68,7 @@ bool Z80Mbc2Cfg::__beginCsvName(const char *csv_name)
   if (!is_ok)
     return is_ok;
 
-  is_ok = __readCsv(csv, csv_name);
+  is_ok = __readCsv(csv, sizeof(csv), csv_name);
   if (is_ok)
     __parseCsv(csv);
 
@@ -77,10 +77,8 @@ bool Z80Mbc2Cfg::__beginCsvName(const char *csv_name)
 
 bool Z80Mbc2Cfg::__openCsv(const char *csv_name)
 {
-  uint8_t operation;
   uint8_t error;
 
-  operation = DevSd::OPEN;
   error = sd_->open(csv_name);
   if (error == FR_NO_FILE)
     return false;
@@ -88,36 +86,26 @@ bool Z80Mbc2Cfg::__openCsv(const char *csv_name)
   if (error == FR_OK)
     return true;
 
-  sd_->printError(error, operation, csv_name);
+  sd_->printError(error, DevSd::OPEN, csv_name);
   while (1)
     ;
 
   return false;
 }
 
-bool Z80Mbc2Cfg::__readCsv(char *csv, const char *csv_name)
+bool Z80Mbc2Cfg::__readCsv(char *csv, uint8_t sz_csv, const char *csv_name)
 {
-  char buf[SZ_BUF];
   uint8_t error;
-  uint8_t operation;
   uint8_t sz_read;
-  size_t pos = 0;
 
-  operation = DevSd::READ;
-  do
-  {
-    error = sd_->read(buf, sizeof(buf), sz_read);
-    if (error != FR_OK)
-      goto __hang_on_error;
-
-    memcpy(&csv[pos], buf, sz_read);
-    pos += sz_read;
-  } while (sz_read == sizeof(buf));
+  error = sd_->read(csv, sz_csv, sz_read);
+  if (error != FR_OK)
+    goto __hang_on_error;
 
   return true;
 
 __hang_on_error:
-  sd_->printError(error, operation, csv_name);
+  sd_->printError(error, DevSd::READ, csv_name);
   while (1)
     ;
 
