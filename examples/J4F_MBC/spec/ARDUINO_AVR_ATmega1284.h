@@ -18,9 +18,9 @@ static inline MbcIo *j4fMbcSpecGetIo(void)
   switch (board_type)
   {
   case MbcBoardTypeClass::TYPE_Z80_MBC2:
-    return &V20MbcIo;
-  case MbcBoardTypeClass::TYPE_V20_MBC:
     return &Z80Mbc2Io;
+  case MbcBoardTypeClass::TYPE_V20_MBC:
+    return &V20MbcIo;
   }
 
   return nullptr;
