@@ -311,7 +311,7 @@ void Z80Mbc2Cfg::printCfg(void)
   Serial.println();
   Serial.printf(F("     F> %-12s"), boot_file_);
   Serial.printf(F(" L> %04X"), load_address_);
-  Serial.printf(F(" B> %04X"), load_address_);
+  Serial.printf(F(" B> %04X"), boot_address_);
   Serial.print(F(" D> "));
   if (disk_set_ >= 0)
     Serial.printf(F("% 2d"), disk_set_);
