@@ -10,10 +10,11 @@ void DevSd::begin(void)
 
   do
   {
-    uint8_t i = 5;
+    uint8_t i = 25;
     do
     {
       error = PFF3a.begin(&fatfs_, PIN_nSS);
+      delay(1);
     } while (--i && (error != FR_OK));
     printError(error, MOUNT);
 
