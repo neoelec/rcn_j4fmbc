@@ -4,6 +4,7 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
+#include "Z80Mbc2IrqStatus.h"
 #include "Z80Mbc2SysCfg.h"
 #include "Z80Mbc2Loader.h"
 #include "Z80Mbc2Pin.h"
@@ -75,6 +76,7 @@ private:
   Z80Mbc2Pin pin_;
   uint8_t staticSysFlags_;
   uint8_t wait_count_;
+  union Z80Mbc2IrqStatus irq_status_;
   uint8_t last_rx_is_empty_;
   bool irq_tty_rx_;
 
@@ -107,8 +109,11 @@ inline void Z80Mbc2IoClass::run(void)
 
 inline void Z80Mbc2IoClass::serialEvent(void)
 {
-  if (irq_tty_rx_ && (Serial.available() > 0))
+  if (irq_tty_rx_ && (Serial.available() > 0)) {
     pin_.setPIN_nINT_LOW();
+    irq_status_.rx_ = 1;
+    pin_.setPIN_nINT_HIGH();
+  }
 }
 
 #endif // __INTERNAL__Z80MBC2BUS_H__

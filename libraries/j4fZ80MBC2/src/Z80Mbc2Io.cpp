@@ -12,6 +12,7 @@ void Z80Mbc2IoClass::begin(void)
 {
   staticSysFlags_ = 0;
   last_rx_is_empty_ = 0;
+  irq_status_.raw_ = 0;
 
   MbcDev.begin(PIN_USER, PIN_MCU_nRTS, PIN_MCU_nCTS);
 
@@ -208,7 +209,7 @@ inline void Z80Mbc2IoClass::__runRead(void)
     else
       last_rx_is_empty_ = 1;
 
-    pin_.setPIN_nINT_HIGH();
+    irq_status_.rx_ = 0;
   }
   else
     __execReadCommand();

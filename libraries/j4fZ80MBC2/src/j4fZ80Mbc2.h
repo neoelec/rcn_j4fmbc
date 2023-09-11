@@ -3,6 +3,7 @@
 
 #include "Z80Mbc2Cfg.h"
 #include "Z80Mbc2Io.h"
+#include "Z80Mbc2IrqStatus.h"
 #include "Z80Mbc2Loader.h"
 #include "Z80Mbc2Menu.h"
 #include "Z80Mbc2Pin.h"
