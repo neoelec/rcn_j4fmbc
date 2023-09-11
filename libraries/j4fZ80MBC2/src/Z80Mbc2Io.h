@@ -57,6 +57,11 @@ public:
   uint8_t getSysFlag(void);
   void enableIrqTtyRx(void);
   void disableIrqTtyRx(void);
+  void enableIrqTick(void);
+  void disableIrqTick(void);
+  void setSysTick(uint8_t sys_tick);
+  void setIrqStatus(uint8_t irq_status);
+  uint8_t getIrqStatus(void);
 
 private:
   void __beginIoDev(void);
@@ -65,6 +70,7 @@ private:
   void __initIoDevRd(void);
   void __setIoDevWr(uint8_t command, MbcDevIo *dev);
   void __setIoDevRd(uint8_t command, MbcDevIo *dev);
+  void __updateSysTick(void);
   inline void __runWrite(void);
   inline void __runRead(void);
   inline void __runInterrupt(void);
@@ -76,9 +82,12 @@ private:
   Z80Mbc2Pin pin_;
   uint8_t staticSysFlags_;
   uint8_t wait_count_;
+  uint8_t sys_tick_;
   union Z80Mbc2IrqStatus irq_status_;
   uint8_t last_rx_is_empty_;
   bool irq_tty_rx_;
+  bool irq_sys_tick_;
+  unsigned long timestamp_;
 
   __Z80Mbc2IoState *state_;
   __Z80Mbc2IoStateInit st_init_;
@@ -91,6 +100,9 @@ private:
   MbcDevIo *io_dev_rd_[MbcIo::RD_NR_CMD];
 
   Z80Mbc2DevWrSETBANK MbcDevWrSETBANK;
+  Z80Mbc2DevWrSETIRQ MbcDevWrSETIRQ;
+  Z80Mbc2DevWrSETTICK MbcDevWrSETTICK;
+  Z80Mbc2DevRdSYSIRQ MbcDevRdSYSIRQ;
 
   friend class __Z80Mbc2IoState;
   friend class __Z80Mbc2IoStateInit;

@@ -12,6 +12,7 @@ void Z80Mbc2IoClass::begin(void)
 {
   staticSysFlags_ = 0;
   last_rx_is_empty_ = 0;
+  sys_tick_ = 100;
   irq_status_.raw_ = 0;
 
   MbcDev.begin(PIN_USER, PIN_MCU_nRTS, PIN_MCU_nCTS);
@@ -49,7 +50,10 @@ void Z80Mbc2IoClass::__beginIoDev(void)
   MbcDevWrUSERLED.begin(user);
   MbcDevRdUSERKEY.begin(user);
 
-  MbcDevWrSETBANK.begin(&pin_);
+  MbcDevWrSETBANK.begin(this, &pin_);
+  MbcDevWrSETIRQ.begin(this, &pin_);
+  MbcDevWrSETTICK.begin(this, &pin_);
+  MbcDevRdSYSIRQ.begin(this, &pin_);
 
   if (gpio->isAvailable())
   {
@@ -82,6 +86,10 @@ void Z80Mbc2IoClass::__initFromCfg(void)
   irq_tty_rx_ = !!cfg.getIrqTtyRx();
   if (irq_tty_rx_)
     Serial.println(F("IOS: IRQ-TTY-RX flag is enabled."));
+
+  irq_sys_tick_ = !!cfg.getIrqSysTick();
+  if (irq_sys_tick_)
+    Serial.println(F("IOS: IRQ-SYS-TICK flag is enabled."));
 }
 
 void Z80Mbc2IoClass::__initIoDevWr(void)
@@ -98,6 +106,8 @@ void Z80Mbc2IoClass::__initIoDevWr(void)
   __setIoDevWr(MbcIo::WR_SELSECT, &MbcDevWrSELSECT);
   __setIoDevWr(MbcIo::WR_WRITESECT, &MbcDevWrWRITESECT);
   __setIoDevWr(MbcIo::WR_SETBANK, &MbcDevWrSETBANK);
+  __setIoDevWr(MbcIo::WR_SETIRQ, &MbcDevWrSETIRQ);
+  __setIoDevWr(MbcIo::WR_SETTICK, &MbcDevWrSETTICK);
 
   if (gpio->isAvailable())
   {
@@ -131,6 +141,8 @@ void Z80Mbc2IoClass::__initIoDevRd(void)
   __setIoDevRd(MbcIo::RD_ERRDISK, &MbcDevRdERRDISK);
   __setIoDevRd(MbcIo::RD_READSECT, &MbcDevRdREADSECT);
   __setIoDevRd(MbcIo::RD_SDMOUNT, &MbcDevRdSDMOUNT);
+  __setIoDevRd(MbcIo::RD_ATXBUFF, &MbcDevRdATXBUFF);
+  __setIoDevRd(MbcIo::RD_SYSIRQ, &MbcDevRdSYSIRQ);
 
   if (gpio->isAvailable())
   {
@@ -144,6 +156,26 @@ void Z80Mbc2IoClass::__setIoDevRd(uint8_t command, MbcDevIo *dev)
   io_dev_rd_[command - MbcIo::RD_BEGIN] = dev;
 }
 
+void Z80Mbc2IoClass::__updateSysTick(void)
+{
+  unsigned long timestamp_new;
+  unsigned long interval;
+
+  if (!irq_sys_tick_)
+    return;
+
+  timestamp_new = micros();
+  interval = static_cast<unsigned long>(sys_tick_) * 1000;
+
+  if ((timestamp_new - timestamp_) <= interval)
+    return;
+
+  pin_.setPIN_nINT_LOW();
+  irq_status_.sys_tick_ = 1;
+  pin_.setPIN_nINT_HIGH();
+  timestamp_ = timestamp_new;
+}
+
 inline void Z80Mbc2IoClass::runIo(void)
 {
   if (!pin_.getPIN_nWAIT())
@@ -155,6 +187,8 @@ inline void Z80Mbc2IoClass::runIo(void)
     else
       __runInterrupt();
   }
+
+  __updateSysTick();
 }
 
 uint8_t Z80Mbc2IoClass::getSysFlag(void)
@@ -170,6 +204,31 @@ void Z80Mbc2IoClass::enableIrqTtyRx(void)
 void Z80Mbc2IoClass::disableIrqTtyRx(void)
 {
   irq_tty_rx_ = false;
+}
+
+void Z80Mbc2IoClass::enableIrqTick(void)
+{
+  irq_sys_tick_ = true;
+}
+
+void Z80Mbc2IoClass::disableIrqTick(void)
+{
+  irq_sys_tick_ = false;
+}
+
+void Z80Mbc2IoClass::setSysTick(uint8_t sys_tick)
+{
+  sys_tick_ = sys_tick;
+}
+
+void Z80Mbc2IoClass::setIrqStatus(uint8_t irq_status)
+{
+  irq_status_.raw_ = irq_status;
+}
+
+uint8_t Z80Mbc2IoClass::getIrqStatus(void)
+{
+  return irq_status_.raw_;
 }
 
 inline void Z80Mbc2IoClass::__runWrite(void)
@@ -298,6 +357,7 @@ void __Z80Mbc2IoStateBootstrap::handle(Z80Mbc2IoClass *io)
   loader.bootstrap();
 
   io->state_ = &io->st_run_;
+  io->timestamp_ = micros();
 }
 
 void __Z80Mbc2IoStateRun::handle(Z80Mbc2IoClass *io)

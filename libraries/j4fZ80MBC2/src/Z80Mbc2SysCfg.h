@@ -5,15 +5,19 @@
 
 #include "Z80Mbc2Pin.h"
 
+class Z80Mbc2IoClass;
+
 class Z80Mbc2SysCfg : public MbcDevIo
 {
 public:
-  void begin(Z80Mbc2Pin *pin)
+  void begin(Z80Mbc2IoClass *mbcIo, Z80Mbc2Pin *pin)
   {
+    mbcIo_ = mbcIo;
     pin_ = pin;
   }
 
 protected:
+  Z80Mbc2IoClass *mbcIo_;
   Z80Mbc2Pin *pin_;
 };
 
@@ -65,6 +69,81 @@ protected:
 //
 // NOTE: If the Os Bank number is greater than 2 no selection is done.
 class Z80Mbc2DevWrSETBANK : public Z80Mbc2SysCfg
+{
+public:
+  void run(MbcIo *io);
+};
+
+// SETIRQ - enable/disable the IRQ generation
+//
+//                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
+//                            ---------------------------------------------------------
+//                              X  X  X  X  X  X  X  0    Serial Rx IRQ not enabled
+//                              X  X  X  X  X  X  X  1    Serial Rx IRQ enabled
+//                              X  X  X  X  X  X  0  X    Systick IRQ not enabled
+//                              X  X  X  X  X  X  1  X    Systick IRQ enabled
+//
+//
+// The INT_ signal is shared among various interrupt requests. This allows to use the simplified
+//  Mode 1 scheme of the Z80 CPU (fixed jump to 0x0038 on INT_ signal active) with multiple interrupt causes.
+// The SETIRQ purpose is to enable/disable the generation of an IRQ (using the INT_ signal)
+//  selecting wich event you want enable.
+// When a IRQ is enabled you have to serve it on the Z80 side with a ISR (Interrupt Service Routine).
+// Inside the ISR code, you have to read the SYSIRQ Opcode to know the exact causes of the interrupt (see the
+//  SYSIRQ Opcode) because multiple causes/bits could be active, so your ISR must be written to check and serve
+//  them all.
+//
+// NOTE 1: Only D0 and D1 are currently used.
+// NOTE 2: At reset time all the IRQ triggers are normally disabled (unless they are enabled for special
+//         boot cases).
+class Z80Mbc2DevWrSETIRQ : public Z80Mbc2SysCfg
+{
+public:
+  void run(MbcIo *io);
+};
+
+// SETTICK - set the Systick timer time (milliseconds)
+//
+//                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
+//                            ---------------------------------------------------------
+//                             D7 D6 D5 D4 D3 D2 D1 D0    Systick time (binary) [1..255]
+//
+// Set/change the time (millisecond) used for the Systick timer.
+// At reset time the default value is 100ms.
+// See SETIRQ and SYSIRQ Opcodes for more info.
+//
+// NOTE: If the time is 0 milliseconds the set operation is ignored.
+class Z80Mbc2DevWrSETTICK : public Z80Mbc2SysCfg
+{
+public:
+  void run(MbcIo *io);
+};
+
+// SYSIRQ - return the "interrupt status byte":
+//
+//                I/O DATA:    D7 D6 D5 D4 D3 D2 D1 D0
+//                            ---------------------------------------------------------
+//                              X  X  X  X  X  X  X  0    Serial Rx IRQ not set
+//                              X  X  X  X  X  X  X  1    Serial Rx IRQ set
+//                              X  X  X  X  X  X  0  X    Systick IRQ not set
+//                              X  X  X  X  X  X  1  X    Systick IRQ set
+//
+//
+// The INT_ signal is shared among various interrupt requests. This allows to use the simplified
+// Mode 1 scheme of the Z80 CPU (fixed jump to 0x0038 on INT_ signal active) with multiple interrupt causes.
+// The SYSIRQ purpose is to allow the Z80 CPU to know the exact causes of the interrupt reading the
+// "interrupt status byte" that contains up to eight "interrupt status bits". So the ISR (Interrupt Service
+// Routine) should be structured to read at first the "interrupt status byte" using the SYSIRQ Opcode,
+// and than execute the needed actions before return to the normal execution.
+// Note that multiple causes/bits could be active.
+//
+//
+//
+// NOTE 1: Only D0 and D1 "interrupt status bit" are currently used.
+// NOTE 2: After the SYSIRQ call all the "interrupt status bits" are cleared.
+// NOTE 3: The INT_ signal is always reset (set to HIGH) after this I/O operation, so you have to call it
+//         always from inside the ISR (on the Z80 side) before to re-enable the Z80 IRQ again.
+class Z80Mbc2DevRdSYSIRQ : public Z80Mbc2SysCfg
 {
 public:
   void run(MbcIo *io);

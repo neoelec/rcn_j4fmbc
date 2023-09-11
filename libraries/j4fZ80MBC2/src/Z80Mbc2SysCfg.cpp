@@ -19,3 +19,33 @@ void Z80Mbc2DevWrSETBANK::run(MbcIo *io)
   }
 }
 
+void Z80Mbc2DevWrSETIRQ::run(MbcIo *io)
+{
+  union Z80Mbc2IrqStatus recevied;
+
+  recevied.raw_ = io->getData();
+
+  if (recevied.rx_)
+    mbcIo_->enableIrqTtyRx();
+  else
+    mbcIo_->disableIrqTtyRx();
+
+  if (recevied.sys_tick_)
+    mbcIo_->enableIrqTick();
+  else
+    mbcIo_->disableIrqTick();
+}
+
+void Z80Mbc2DevWrSETTICK::run(MbcIo *io)
+{
+  int8_t sys_tick = (int8_t)io->getData();
+
+  if (sys_tick > 0)
+    mbcIo_->setSysTick(sys_tick);
+}
+
+void Z80Mbc2DevRdSYSIRQ::run(MbcIo *io)
+{
+  io->setData(mbcIo_->getIrqStatus());
+  mbcIo_->setIrqStatus(0);
+}
