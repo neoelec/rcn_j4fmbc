@@ -162,6 +162,10 @@ void Z80Mbc2Cfg::__parseToken(char *token, uint8_t i)
     tmp = strtol(token, NULL, 10);
     irq_tty_rx_ = static_cast<uint8_t>(tmp);
     break;
+  case 6: // irq_sys_tick_
+    tmp = strtol(token, NULL, 10);
+    irq_sys_tick_ = static_cast<uint8_t>(tmp);
+    break;
   }
 }
 
@@ -193,6 +197,11 @@ int8_t Z80Mbc2Cfg::getDiskSet(void)
 uint8_t Z80Mbc2Cfg::getIrqTtyRx(void)
 {
   return irq_tty_rx_;
+}
+
+uint8_t Z80Mbc2Cfg::getIrqSysTick(void)
+{
+  return irq_sys_tick_;
 }
 
 uint8_t Z80Mbc2Cfg::getBootMode(void)
@@ -318,6 +327,7 @@ void Z80Mbc2Cfg::printCfg(void)
   else
     Serial.print(F("NA"));
   Serial.printf(F(" T> %-3s"), irq_tty_rx_ ? "ON" : "OFF");
+  Serial.printf(F(" S> %-3s"), irq_sys_tick_? "ON" : "OFF");
   Serial.printf(F(" A> %-3s"), autoexec_en_ ? "ON" : "OFF");
   Serial.print(F(" C> "));
   printClk(clock_mode_);

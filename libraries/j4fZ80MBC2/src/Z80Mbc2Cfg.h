@@ -22,6 +22,7 @@ public:
   uint16_t getBootAddress(void);
   int8_t getDiskSet(void);
   uint8_t getIrqTtyRx(void);
+  uint8_t getIrqSysTick(void);
   uint8_t getBootMode(void);
   uint8_t getBoardType(void);
   uint8_t getAutoExecEn(void);
@@ -56,6 +57,7 @@ private:
   uint16_t boot_address_;
   int8_t disk_set_;
   uint8_t irq_tty_rx_;
+  uint8_t irq_sys_tick_;
 
   uint8_t boot_mode_;
   uint8_t autoexec_en_;
