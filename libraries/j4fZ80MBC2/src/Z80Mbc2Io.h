@@ -105,7 +105,7 @@ inline void Z80Mbc2IoClass::run(void)
 
 inline void Z80Mbc2IoClass::serialEvent(void)
 {
-  if (irq_tty_rx_ && Serial.available())
+  if (irq_tty_rx_ && (Serial.available() > 0))
     pin_.setPIN_nINT_LOW();
 }
 

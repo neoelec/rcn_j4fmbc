@@ -33,7 +33,7 @@ inline void MbcDevRdSYSFLAGSClass::run(MbcIo *io)
 {
   uint8_t io_data = io->getSysFlag();
 
-  io_data |= (!!Serial.available()) << TTY_RX_BUF;
+  io_data |= (Serial.available() > 0) << TTY_RX_BUF;
 
   io->setData(io_data);
 }

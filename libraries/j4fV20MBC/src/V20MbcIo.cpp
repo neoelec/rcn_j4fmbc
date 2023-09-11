@@ -147,7 +147,7 @@ inline void V20MbcIoClass::runIo(void)
       __runHalt();
   }
 
-  if (Serial.available() && getIrq(MbcIo::IRQ_RX))
+  if ((Serial.available() > 0) && getIrq(MbcIo::IRQ_RX))
     pin_.setPIN_INTR_HIGH();
 }
 
