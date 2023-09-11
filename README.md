@@ -12,18 +12,18 @@
 - You can use the original SD file - SD-S220718-R240620-v1.zip - with files in the 'contents/SD-S220718-R240620-v1' directory.
 - Example - BOOTMO05.CSV
 ```
-CP/M V3.0,CPMLDR.COM,0100,0100,2,0
+CP/M V3.0,CPMLDR.COM,0100,0100,2,0,0
 ```
-|Description|Boot File|Load Addr|Boot Addr|Disk Set|IRQ Tty Rx|
-|-|-|-|-|-|-|
-|CP/M V3.0|CPMLDR.COM|0100|0100|2|0|
+|Description|Boot File|Load Addr|Boot Addr|Disk Set|IRQ Tty Rx|IRQ Sys Tick|
+|-|-|-|-|-|-|-|
+|CP/M V3.0|CPMLDR.COM|0100|0100|2|0|0|
 - Example - BOOTMO01.CSV
 ```
-Z80 BASIC Ver 4.7b,BASIC47.BIN,0000,0000,-1,1
+Z80 BASIC Ver 4.7b,BASIC47.BIN,0000,0000,-1,1,0
 ```
-|Description|Boot File|Load Addr|Boot Addr|Disk Set|IRQ Tty Rx|
-|-|-|-|-|-|-|
-|Z80 BASIC Ver 4.7b|BASIC47.BIN|0000|0000|-1|1|
+|Description|Boot File|Load Addr|Boot Addr|Disk Set|IRQ Tty Rx|IRQ Sys Tick|
+|-|-|-|-|-|-|-|
+|Z80 BASIC Ver 4.7b|BASIC47.BIN|0000|0000|-1|1|0|
 
 ### V20-MBC2
 - You can find pre-devined CSV files in the 'contents/SD-S260320-R230520-v3' directory.
