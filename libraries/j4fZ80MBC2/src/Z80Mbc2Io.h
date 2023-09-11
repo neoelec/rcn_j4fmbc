@@ -54,6 +54,8 @@ public:
   inline void serialEvent(void);
   inline void runIo(void);
   uint8_t getSysFlag(void);
+  void enableIrqTtyRx(void);
+  void disableIrqTtyRx(void);
 
 private:
   void __beginIoDev(void);

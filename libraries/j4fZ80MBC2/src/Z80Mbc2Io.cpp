@@ -161,6 +161,16 @@ uint8_t Z80Mbc2IoClass::getSysFlag(void)
   return staticSysFlags_ | ((!!last_rx_is_empty_) << MbcDevRdSYSFLAGSClass::PREV_RX);
 }
 
+void Z80Mbc2IoClass::enableIrqTtyRx(void)
+{
+  irq_tty_rx_ = true;
+}
+
+void Z80Mbc2IoClass::disableIrqTtyRx(void)
+{
+  irq_tty_rx_ = false;
+}
+
 inline void Z80Mbc2IoClass::__runWrite(void)
 {
   _setAddress(pin_.getPIN_AD0());
