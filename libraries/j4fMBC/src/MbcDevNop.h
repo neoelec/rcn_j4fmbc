@@ -11,6 +11,7 @@ public:
 
 inline void MbcDevRdWrNOPClass::run(MbcIo *io)
 {
+  io = io;
 }
 
 extern MbcDevRdWrNOPClass MbcDevRdWrNOP;

@@ -269,7 +269,7 @@ inline void V20MbcIoClass::__execWriteOpcode(void)
 {
   uint8_t command = getCommand();
 
-  if (likely(command >= MbcIo::WR_BEGIN && command <= MbcIo::WR_END))
+  if (likely(/* command >= MbcIo::WR_BEGIN && */ command <= MbcIo::WR_END))
   {
     io_dev_wr_[command - MbcIo::WR_BEGIN]->run(this);
 

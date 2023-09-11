@@ -111,7 +111,10 @@ void Z80Mbc2IoClass::__initIoDevWr(void)
 
 void Z80Mbc2IoClass::__setIoDevWr(uint8_t command, MbcDevIo *dev)
 {
-  io_dev_wr_[command - MbcIo::WR_BEGIN] = dev;
+  if (command >= ARRAY_SIZE(io_dev_wr_))
+    return;
+
+  io_dev_wr_[command /* - MbcIo::WR_BEGIN */] = dev;
 }
 
 void Z80Mbc2IoClass::__initIoDevRd(void)
@@ -227,7 +230,7 @@ inline void Z80Mbc2IoClass::__execWriteCommand(void)
 {
   uint8_t command = getCommand();
 
-  if (likely(command >= MbcIo::WR_BEGIN && command <= MbcIo::WR_END))
+  if (likely(/* command >= MbcIo::WR_BEGIN && */ command <= MbcIo::WR_END))
   {
     io_dev_wr_[command - MbcIo::WR_BEGIN]->run(this);
 

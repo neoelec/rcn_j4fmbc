@@ -57,7 +57,7 @@ void V20MbcLoader::__loadFwFor86Mode(V20MbcCfg *cfg)
 
 void V20MbcLoader::__loadFwFor80Mode(V20MbcCfg *cfg)
 {
-  const uint8_t op_JMPF = 0xEA;
+//  const uint8_t op_JMPF = 0xEA;
   V20MbcCfg cfg80;
   uint16_t boot_size;
 
