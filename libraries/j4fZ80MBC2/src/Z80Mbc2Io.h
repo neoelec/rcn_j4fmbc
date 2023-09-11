@@ -121,6 +121,16 @@ inline void Z80Mbc2IoClass::run(void)
 
 inline void Z80Mbc2IoClass::serialEvent(void)
 {
+  static unsigned long last;
+  unsigned long timestamp;
+
+  /* FIXME: This is an workaround to prevent IRQ storimg */
+  timestamp = millis();
+  if ((timestamp - last) < 125)
+    return;
+
+  last = timestamp;
+
   if (irq_tty_rx_ && (Serial.available() > 0)) {
     pin_.setPIN_nINT_LOW();
     irq_status_.rx_ = 1;
