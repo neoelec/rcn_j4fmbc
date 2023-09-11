@@ -4,7 +4,7 @@
 #include <j4fDev.h>
 #include <j4fMbc.h>
 
-#include "Z80Mbc2DevBank.h"
+#include "Z80Mbc2SysCfg.h"
 #include "Z80Mbc2Loader.h"
 #include "Z80Mbc2Pin.h"
 

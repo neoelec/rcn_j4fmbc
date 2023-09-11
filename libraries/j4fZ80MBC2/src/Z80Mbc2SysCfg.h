@@ -5,7 +5,7 @@
 
 #include "Z80Mbc2Pin.h"
 
-class Z80Mbc2DevBank : public MbcDevIo
+class Z80Mbc2SysCfg : public MbcDevIo
 {
 public:
   void begin(Z80Mbc2Pin *pin)
@@ -64,29 +64,10 @@ protected:
 //
 //
 // NOTE: If the Os Bank number is greater than 2 no selection is done.
-class Z80Mbc2DevWrSETBANK : public Z80Mbc2DevBank
+class Z80Mbc2DevWrSETBANK : public Z80Mbc2SysCfg
 {
 public:
-  inline void run(MbcIo *io);
+  void run(MbcIo *io);
 };
-
-inline void Z80Mbc2DevWrSETBANK::run(MbcIo *io)
-{
-  switch (io->getData())
-  {
-  case 0:
-    pin_->setPIN_BANK0_HIGH();
-    pin_->setPIN_BANK1_LOW();
-    break;
-  case 1:
-    pin_->setPIN_BANK0_HIGH();
-    pin_->setPIN_BANK1_HIGH();
-    break;
-  case 2:
-    pin_->setPIN_BANK0_LOW();
-    pin_->setPIN_BANK1_HIGH();
-    break;
-  }
-}
 
 #endif // __INTERNAL__Z80MBC2DEVBANK_H__
