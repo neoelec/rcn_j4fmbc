@@ -5,6 +5,7 @@
 #include "j4fZ80Mbc2.h"
 
 #define PIN_LED_IOS 0 // PB0 pin 1    Led LED_IOS is ON if HIGH
+#define PIN_USER 13   // PD5 pin 19   Led USER and key (led USER is ON if LOW)
 
 Z80Mbc2MenuClass Z80Mbc2Menu;
 
@@ -18,6 +19,8 @@ void Z80Mbc2MenuClass::begin(void)
 
 void Z80Mbc2MenuClass::enter(void)
 {
+  __turnOffUserLed();
+
   Serial.println();
   Serial.print(F("IOS: Entering to menu ..."));
 
@@ -33,6 +36,8 @@ bool Z80Mbc2MenuClass::run(void)
 {
   if (isDone())
     return false;
+
+  __blinkIosLed();
 
   uint8_t cmd = menu_cmd_.UserRequest();
   if (cmd)
@@ -245,7 +250,7 @@ void Z80Mbc2MenuClass::__adjustRtc(stDateTimeGroup &dtg)
   rtc_->adjust(dt);
 }
 
-void Z80Mbc2MenuClass::__blinkLed(void)
+void Z80Mbc2MenuClass::__blinkIosLed(void)
 {
   static unsigned long timestamp;
 
@@ -254,6 +259,13 @@ void Z80Mbc2MenuClass::__blinkLed(void)
     digitalWrite(PIN_LED_IOS, !digitalRead(PIN_LED_IOS));
     timestamp = millis();
   }
+}
+
+void Z80Mbc2MenuClass::__turnOffUserLed(void)
+{
+  pinMode(PIN_USER, OUTPUT);
+  digitalWrite(PIN_USER, HIGH);
+  pinMode(PIN_USER, INPUT_PULLUP);
 }
 
 void Z80Mbc2MenuClass::__initializeMenuCmd(void)
