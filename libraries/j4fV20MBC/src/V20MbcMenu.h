@@ -25,7 +25,8 @@ public:
 
 private:
   void __adjustRtc(stDateTimeGroup &dtg);
-  void __blinkLed(void);
+  void __blinkIosLed(void);
+  void __turnOffUserLed(void);
   void __initializeMenuCmd(void);
 
 private:

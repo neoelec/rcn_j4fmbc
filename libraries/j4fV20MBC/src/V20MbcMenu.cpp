@@ -5,6 +5,7 @@
 #include "j4fV20Mbc.h"
 
 #define PIN_LED_IOS 0 // PB0 pin 1    NOTE: it shares the same pin of RDYRES_
+#define PIN_USER 13   // PD5 pin 19   Led USER and key (led USER is ON if LOW)
 
 V20MbcMenuClass V20MbcMenu;
 
@@ -18,6 +19,8 @@ void V20MbcMenuClass::begin(void)
 
 void V20MbcMenuClass::enter(void)
 {
+  __turnOffUserLed();
+
   Serial.println();
   Serial.print(F("IOS: Entering to menu ..."));
 
@@ -33,6 +36,8 @@ bool V20MbcMenuClass::run(void)
 {
   if (isDone())
     return false;
+
+  __blinkIosLed();
 
   uint8_t cmd = menu_cmd_.UserRequest();
   if (cmd)
@@ -245,7 +250,7 @@ void V20MbcMenuClass::__adjustRtc(stDateTimeGroup &dtg)
   rtc_->adjust(dt);
 }
 
-void V20MbcMenuClass::__blinkLed(void)
+void V20MbcMenuClass::__blinkIosLed(void)
 {
   static unsigned long timestamp;
 
@@ -254,6 +259,13 @@ void V20MbcMenuClass::__blinkLed(void)
     digitalWrite(PIN_LED_IOS, !digitalRead(PIN_LED_IOS));
     timestamp = millis();
   }
+}
+
+void V20MbcMenuClass::__turnOffUserLed(void)
+{
+  pinMode(PIN_USER, OUTPUT);
+  digitalWrite(PIN_USER, HIGH);
+  pinMode(PIN_USER, INPUT_PULLUP);
 }
 
 void V20MbcMenuClass::__initializeMenuCmd(void)
