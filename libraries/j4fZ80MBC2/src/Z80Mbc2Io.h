@@ -131,7 +131,7 @@ inline void Z80Mbc2IoClass::serialEvent(void)
 
   last = timestamp;
 
-  if (irq_tty_rx_ && (Serial.available() > 0)) {
+  if (irq_tty_rx_ && (Serial.available() > 0) && last_rx_is_empty_ == 0) {
     pin_.setPIN_nINT_LOW();
     irq_status_.rx_ = 1;
     pin_.setPIN_nINT_HIGH();
