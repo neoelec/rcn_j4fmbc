@@ -17,6 +17,8 @@ void Z80Mbc2DevWrSETBANK::run(MbcIo *io)
     pin_->setPIN_BANK1_HIGH();
     break;
   }
+
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 void Z80Mbc2DevWrSETIRQ::run(MbcIo *io)
@@ -34,6 +36,8 @@ void Z80Mbc2DevWrSETIRQ::run(MbcIo *io)
     mbcIo_->enableIrqTick();
   else
     mbcIo_->disableIrqTick();
+
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 void Z80Mbc2DevWrSETTICK::run(MbcIo *io)
@@ -42,10 +46,13 @@ void Z80Mbc2DevWrSETTICK::run(MbcIo *io)
 
   if (sys_tick > 0)
     mbcIo_->setSysTick(sys_tick);
+
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 void Z80Mbc2DevRdSYSIRQ::run(MbcIo *io)
 {
   io->setData(mbcIo_->getIrqStatus());
   mbcIo_->setIrqStatus(0);
+  io->setCommand(MbcIo::NO_OPERATION);
 }
