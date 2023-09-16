@@ -31,6 +31,7 @@ public:
 inline void MbcDevWrGPIOAClass::run(MbcIo *io)
 {
   gpio_->writeGPIOA(io->getData());
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // GPIOB Write (GPE Option):
@@ -47,6 +48,7 @@ public:
 inline void MbcDevWrGPIOBClass::run(MbcIo *io)
 {
   gpio_->writeGPIOB(io->getData());
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // IODIRA Write (GPE Option):
@@ -63,6 +65,7 @@ public:
 inline void MbcDevWrIODIRAClass::run(MbcIo *io)
 {
   gpio_->writeIODIRA(io->getData());
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // IODIRB Write (GPE Option):
@@ -79,6 +82,7 @@ public:
 inline void MbcDevWrIODIRBClass::run(MbcIo *io)
 {
   gpio_->writeIODIRB(io->getData());
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // GPPUA Write (GPE Option):
@@ -95,6 +99,7 @@ public:
 inline void MbcDevWrGPPUAClass::run(MbcIo *io)
 {
   gpio_->writeGPPUA(io->getData());
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // GPPUB Write (GPIO Exp. Mod. ):
@@ -111,6 +116,7 @@ public:
 inline void MbcDevWrGPPUBClass::run(MbcIo *io)
 {
   gpio_->writeGPPUB(io->getData());
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // GPIOA Read (GPE Option):
@@ -129,6 +135,7 @@ public:
 inline void MbcDevRdGPIOAClass::run(MbcIo *io)
 {
   io->setData(gpio_->readGPIOA());
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // GPIOB Read (GPE Option):
@@ -147,6 +154,7 @@ public:
 inline void MbcDevRdGPIOBClass::run(MbcIo *io)
 {
   io->setData(gpio_->readGPIOB());
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 extern MbcDevWrGPIOAClass MbcDevWrGPIOA;

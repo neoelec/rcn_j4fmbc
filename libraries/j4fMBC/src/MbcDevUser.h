@@ -36,6 +36,8 @@ inline void MbcDevWrUSERLEDClass::run(MbcIo *io)
     user_->setLedOn();
   else
     user_->setLedOff();
+
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // USER KEY:
@@ -52,6 +54,7 @@ public:
 inline void MbcDevRdUSERKEYClass::run(MbcIo *io)
 {
   io->setData(user_->getKey());
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 extern MbcDevWrUSERLEDClass MbcDevWrUSERLED;

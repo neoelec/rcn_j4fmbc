@@ -11,7 +11,7 @@ public:
 
 inline void MbcDevRdWrNOPClass::run(MbcIo *io)
 {
-  io = io;
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 extern MbcDevRdWrNOPClass MbcDevRdWrNOP;

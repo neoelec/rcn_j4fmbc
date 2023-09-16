@@ -57,6 +57,7 @@ public:
 inline void MbcDevWrSELDISKClass::run(MbcIo *io)
 {
   disk_->ioWrSELDISK(io);
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // DISK EMULATION
@@ -121,6 +122,7 @@ public:
 inline void MbcDevWrSELSECTClass::run(MbcIo *io)
 {
   disk_->ioWrSELSECT(io);
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // DISK EMULATION
@@ -207,6 +209,7 @@ public:
 inline void MbcDevRdERRDISKClass::run(MbcIo *io)
 {
   disk_->ioRdERRDISK(io);
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 // DISK EMULATION
@@ -269,6 +272,7 @@ public:
 inline void MbcDevRdSDMOUNTClass::run(MbcIo *io)
 {
   disk_->ioRdSDMOUNT(io);
+  io->setCommand(MbcIo::NO_OPERATION);
 }
 
 extern MbcDevWrSELDISKClass MbcDevWrSELDISK;
