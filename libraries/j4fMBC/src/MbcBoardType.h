@@ -9,7 +9,7 @@ public:
     TYPE_Z80_MBC2,
     TYPE_V20_MBC,
     NR_BOARD_TYPE,
-  }; 
+  };
   void begin(void);
   uint8_t getBoardType(void);
   void setBoardType(uint8_t board_type);
